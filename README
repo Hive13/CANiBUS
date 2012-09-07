@@ -1,0 +1,62 @@
+-= CANiBUS Server =-
+
+wiki: http://wiki.hive13.org/CANiBUS
+
+-== Summary ==-
+The CANiBUS Server connects one or more CAN devices to one or more researchers.
+The CANiBUS Server has drivers for each CAN device that abstracts the
+communication with the client.  It provides a method for multiple researchers
+to connect to a Vehicle and work together to analyze the CANbus system.  This
+allows for an unlimited number of research to work without additional strain
+on the electrical system of the vehicle.  This works well for instructional
+environment or remote research on a vehicle.
+
+!!!NOTE!!! This is VERY ALPHA.  It may cause unexpected results to your
+vehicle, which may include but are not limited to: stalling, bricking the
+system, locking the breaks, or becoming a Decepticon.  We can not be held 
+responsible for the use of this product.
+
+-== Server Features ==-
+Currently supported CAN Devices:
+ * CANSIM - CAN bus simulator (built-in)
+ ( more devices will be added as the server matures )
+
+ * Lobby
+ ** Lists available connected CAN devices
+ ** Group chat for discussion prior to starting
+ ** Ability to start a 'hack session' on a device
+
+ * Hack Sessions
+ ** Read-only mode (instructor mode)
+ ** Chat private to that hack session
+
+-== Client ==-
+The protocol is documented on the wiki so any client can connect (or bot for
+that matter).  The network protocol is XML an fairly self documenting but you
+will want to refer to the server source or the wiki if you want to write your
+own.  There is a built-in ncurses client in the client/ folder.  This code
+can be used as an example on how to implement some of the APIs.  Ncurses
+was chosen because:
+
+* Simple interface
+* Works via SSH
+* Could be used as a server admin tool for CANiBUS server maintenance
+
+-== Build Requirements ==-
+
+* libcapsinetwork (server)
+* libtinyxml (client)
+* libncurses (client)
+
+These should all be available via a debian based distro (get the -dev versions)
+
+-== Credits ==-
+This is for the Open Garages VRL project.  This has been used and tested
+at the Hive13 VRL facility.
+
+Originally written by Craig Smith <craig@hive13.org>
+
+Main network/lobby code shamelessly stolen from the Monopd project :)
+
+All code is GPL compliant.  See COPYING
+
