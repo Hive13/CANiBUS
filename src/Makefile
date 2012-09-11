@@ -50,7 +50,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_canibusd_OBJECTS = main.$(OBJEXT) server.$(OBJEXT) \
 	sessionobject.$(OBJEXT) client.$(OBJEXT) \
 	sessionproperty.$(OBJEXT) hacksession.$(OBJEXT) io.$(OBJEXT) \
-	candevice.$(OBJEXT)
+	candevice.$(OBJEXT) serial.$(OBJEXT) elmcandevice.$(OBJEXT)
 canibusd_OBJECTS = $(am_canibusd_OBJECTS)
 canibusd_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
@@ -157,10 +157,11 @@ top_srcdir = ..
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 canibusd_SOURCES = main.cc server.cc sessionobject.cc client.cc \
-  sessionproperty.cc hacksession.cc io.cc candevice.cc
+  sessionproperty.cc hacksession.cc io.cc candevice.cc serial.cc \
+  elmcandevice.cc
 
 noinst_HEADERS = main.h server.h sessionobject.h client.h sessionproperty.h \
-  hacksession.h io.h candevice.h
+  hacksession.h io.h candevice.h serial.h elmcandevice.h
 
 canibusd_LDADD = -lcapsinetwork
 all: all-am
@@ -246,9 +247,11 @@ distclean-compile:
 
 include ./$(DEPDIR)/candevice.Po
 include ./$(DEPDIR)/client.Po
+include ./$(DEPDIR)/elmcandevice.Po
 include ./$(DEPDIR)/hacksession.Po
 include ./$(DEPDIR)/io.Po
 include ./$(DEPDIR)/main.Po
+include ./$(DEPDIR)/serial.Po
 include ./$(DEPDIR)/server.Po
 include ./$(DEPDIR)/sessionobject.Po
 include ./$(DEPDIR)/sessionproperty.Po

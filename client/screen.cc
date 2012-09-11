@@ -18,7 +18,7 @@ Screen::Screen()
 	halfdelay(1);	// non-blocking-ish
 	noecho();	// We'll handle echo
 
-	if(has_colors() == TRUE) {
+	if(has_colors() != FALSE) {
 		start_color();
 		init_pair(1, COLOR_BLUE, -1);
 		init_pair(2, COLOR_WHITE, -1);
@@ -27,7 +27,7 @@ Screen::Screen()
 	
 	getmaxyx(stdscr,row,col);
 	m_promptWin = newwin(1, col, row-1, 0);
-	m_chatWin = newwin( row-10, col, row-10, 0 );
+	m_chatWin = newwin( 9, col, row-10, 0 );
 	m_lobbyWin = newwin( row-(row-8), col, 1, 0 );
 
 	promptUpdated = true;

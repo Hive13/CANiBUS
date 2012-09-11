@@ -1,3 +1,4 @@
+#include "serial.h"
 #include "candevice.h"
 #include "hacksession.h"
 
@@ -5,9 +6,16 @@ CanDevice::CanDevice(int id) : SessionObject(id, SessionObject::SCan)
 {
 	setProperty("name", "Unknown", this);
 	setProperty("description", "No description available");
+	m_port = "";
 }
 
 CanDevice::~CanDevice()
+{
+
+}
+
+// Stub function
+void CanDevice::init()
 {
 
 }

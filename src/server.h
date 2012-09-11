@@ -30,6 +30,7 @@ public:
 
 	void initCanbusDevices();
 	CanDevice *findCanDeviceById(unsigned int id);
+	bool canInUse(std::string canPort);
 
 	void sendXMLUpdates();
 	void sendXMLUpdate(Client *cOutput, bool fullUpdate = false, bool excludeSelf = false);

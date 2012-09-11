@@ -27,6 +27,7 @@ public:
 	Screen *screen() { return m_screen; }
 	void sendChat(std::string msg);
 	void disconnect();
+	void refresh();
 private:
 	bool m_finishedInit;
 	Socket *m_socket;

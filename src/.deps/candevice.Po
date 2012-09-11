@@ -1,5 +1,4 @@
-candevice.o: candevice.cc candevice.h sessionobject.h \
- /usr/include/c++/4.5/string \
+candevice.o: candevice.cc serial.h /usr/include/c++/4.5/string \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/c++config.h \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/os_defines.h \
  /usr/include/features.h /usr/include/bits/predefs.h \
@@ -50,16 +49,19 @@ candevice.o: candevice.cc candevice.h sessionobject.h \
  /usr/include/getopt.h /usr/include/bits/unistd.h \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/atomic_word.h \
  /usr/include/c++/4.5/initializer_list \
- /usr/include/c++/4.5/bits/basic_string.tcc /usr/include/c++/4.5/vector \
- /usr/include/c++/4.5/bits/stl_construct.h \
+ /usr/include/c++/4.5/bits/basic_string.tcc /usr/include/c++/4.5/queue \
+ /usr/include/c++/4.5/deque /usr/include/c++/4.5/bits/stl_construct.h \
  /usr/include/c++/4.5/bits/stl_uninitialized.h \
+ /usr/include/c++/4.5/bits/stl_deque.h \
+ /usr/include/c++/4.5/bits/deque.tcc /usr/include/c++/4.5/vector \
  /usr/include/c++/4.5/bits/stl_vector.h \
  /usr/include/c++/4.5/bits/stl_bvector.h \
- /usr/include/c++/4.5/bits/vector.tcc hacksession.h
+ /usr/include/c++/4.5/bits/vector.tcc \
+ /usr/include/c++/4.5/bits/stl_heap.h \
+ /usr/include/c++/4.5/bits/stl_queue.h candevice.h sessionobject.h \
+ hacksession.h
 
-candevice.h:
-
-sessionobject.h:
+serial.h:
 
 /usr/include/c++/4.5/string:
 
@@ -215,16 +217,32 @@ sessionobject.h:
 
 /usr/include/c++/4.5/bits/basic_string.tcc:
 
-/usr/include/c++/4.5/vector:
+/usr/include/c++/4.5/queue:
+
+/usr/include/c++/4.5/deque:
 
 /usr/include/c++/4.5/bits/stl_construct.h:
 
 /usr/include/c++/4.5/bits/stl_uninitialized.h:
+
+/usr/include/c++/4.5/bits/stl_deque.h:
+
+/usr/include/c++/4.5/bits/deque.tcc:
+
+/usr/include/c++/4.5/vector:
 
 /usr/include/c++/4.5/bits/stl_vector.h:
 
 /usr/include/c++/4.5/bits/stl_bvector.h:
 
 /usr/include/c++/4.5/bits/vector.tcc:
+
+/usr/include/c++/4.5/bits/stl_heap.h:
+
+/usr/include/c++/4.5/bits/stl_queue.h:
+
+candevice.h:
+
+sessionobject.h:
 
 hacksession.h:

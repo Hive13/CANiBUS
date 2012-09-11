@@ -47,6 +47,8 @@ int main(int argc, char *argv[]) {
 				quit = true;
 			} else if(cmd.compare(0, 6, "/nick ") == 0)
 				handler->nick(cmd.substr(6));
+			else if(cmd.compare(0, 8, "/refresh") == 0)
+				handler->refresh();
 		} else {
 			handler->sendChat(cmd);
 		}

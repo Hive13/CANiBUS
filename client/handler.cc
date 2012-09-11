@@ -194,6 +194,11 @@ void CanibusHandler::nick(std::string username)
 	m_socket->ioWrite(".n"+username);
 }
 
+void CanibusHandler::refresh()
+{
+	m_socket->ioWrite(".sr");
+}
+
 void CanibusHandler::setState(CanibusState *state)
 {
 	if(m_screen)

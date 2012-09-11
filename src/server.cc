@@ -7,6 +7,9 @@
 #include <syslog.h>
 #include <unistd.h>
 
+#include <iostream>
+#include <sstream>
+#include <fstream>
 #include <string>
 #include <libcapsinetwork/socket.h>
 
@@ -15,8 +18,12 @@
 #include "sessionobject.h"
 #include "const.h"
 #include "candevice.h"
+#include "elmcandevice.h"
 #include "client.h"
 #include "server.h"
+#include "serial.h"
+
+using namespace std;
 
 CanibusServer::CanibusServer() : SessionObject(0)
 {
@@ -38,15 +45,73 @@ CanibusServer::~CanibusServer()
 
 }
 
+bool CanibusServer::canInUse(std::string canPort)
+{
+	CanDevice *can;
+	for(std::vector<CanDevice *>::iterator it = m_canbusDevices.begin() ; it != m_canbusDevices.end() && (can = *it) ; ++it) 
+		if(can->port().compare(canPort) == 0)
+			return true;
+	return false;
+}
+
 void CanibusServer::initCanbusDevices()
 {
+	std::ostringstream oss;
+	int devnum = 0;
+	bool found, done = false;
+	std::string response;
+	int timeout_count;
 	// If this is the first time then init the simulator
 	if (m_canbusDevices.size() == 0)
 	{
 		CanbusSimulator *sim = new CanbusSimulator(m_nextCanbusId++);
 		m_canbusDevices.push_back(sim);
 	}
-	// TODO other detection methods
+	// Serial devices should be linked to /dev/obdX
+	while(!done) {
+		oss << "/dev/obd" << devnum;
+		std::ifstream serialDev(oss.str().c_str());
+		if (serialDev.good()) {
+			cerr << "Checking " << oss.str() << "...";
+			if(canInUse(oss.str())) {
+				cerr << "skipping" << endl;
+				devnum++;
+				continue;
+			}
+			found = false;
+			// Check for ELM327
+			Serial *serial = new Serial();
+			serial->setPort(oss.str().c_str());
+			serial->setBaud(38400);
+			if(serial->open() > 1) {
+				serial->ioWrite("ATZ\r");
+				timeout_count = 1000;
+				while(--timeout_count > 0) {
+				  response = serial->readLine();
+				  if(response.size() > 0) {
+					if(response.compare(0, 3, "ELM") == 0) {
+						cout << "found" << endl;
+						found = true;
+						ELMCanDevice *elm = new ELMCanDevice(m_nextCanbusId++);
+						elm->setSerial(serial);
+						elm->init();
+						m_canbusDevices.push_back(elm);
+						timeout_count = 0;
+					}
+				  }
+				  usleep(5000);
+				}
+				devnum++;
+			} else {
+				done = true;
+			}
+			if (!found)
+				cout << "not can" << endl;
+		} else {
+			done = true;
+		}
+	}
+	// Scan USB devices (non-serial)
 }
 
 Client *CanibusServer::findClient(int clientId)
@@ -411,6 +476,10 @@ void CanibusServer::processCommands(Client *cInput, const std::string data2)
 			switch(data[1])
 			{
 				case 'l':
+					sendHackSessionList(cInput);
+					return;
+				case 'r':
+					initCanbusDevices();
 					sendHackSessionList(cInput);
 					return;
 				default:

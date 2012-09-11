@@ -13,12 +13,13 @@ environment or remote research on a vehicle.
 
 !!!NOTE!!! This is VERY ALPHA.  It may cause unexpected results to your
 vehicle, which may include but are not limited to: stalling, bricking the
-system, locking the breaks, or becoming a Decepticon.  We can not be held 
+system, locking the brakes, or becoming a Decepticon.  We can not be held 
 responsible for the use of this product.
 
 -== Server Features ==-
 Currently supported CAN Devices:
  * CANSIM - CAN bus simulator (built-in)
+ * ELM32x - (Initial support added)
  ( more devices will be added as the server matures )
 
  * Lobby
