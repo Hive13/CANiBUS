@@ -103,7 +103,7 @@ const std::string HackSession::statusLabel()
 
 void HackSession::sendStatus(Client *client)
 {
-	client->ioWrite("<canibusd><sessionupdate sessionid=\"%d\" status=\"%s\"/></canibusd>\n", m_id, statusLabel().c_str());
+	client->ioWrite("<canibusd><hacksessionupdate sessionid=\"%d\" status=\"%s\"/></canibusd>\n", m_id, statusLabel().c_str());
 }
 
 void HackSession::sendClientList(Client *client)

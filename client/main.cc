@@ -3,19 +3,31 @@
 #include "socket.h"
 #include "handler.h"
 #include "screen.h"
+#include "state.h"
 #include "canibusmsg.h"
 
+#include <signal.h>
 #include <ncurses.h>
 
 #include <iostream>
 #include <string>
 
 using namespace std;
+ 
+// Global to support signals
+CanibusHandler *handler = 0;
+
+void do_resize(int dummy)
+{
+  if(handler && handler->screen())  {
+	handler->screen()->resize();
+	handler->screen()->refreshScr();
+  }
+}
 
 int main(int argc, char *argv[]) {
   bool quit = false;
   Socket *client = 0;
-  CanibusHandler *handler = 0;
   CanibusMsg *msg = 0;
   std::string username;
   if (argc == 3) {
@@ -26,6 +38,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Username: ";
   cin >> username;
+  signal(SIGWINCH, do_resize);
   std::string cmd;
   if(client->connect()) {
 	client->enablePolling();
@@ -33,7 +46,6 @@ int main(int argc, char *argv[]) {
 	Screen *scr = new Screen();
 	handler->setScreen(scr);
 	handler->nick(username);
-	scr->centerWrite("Connected to CANiBUS Server v"+client->serverVersion());
 	while(!quit) {
 		if((msg = handler->poll())) {
 			if(msg->type().compare("chat") == 0)
@@ -41,7 +53,7 @@ int main(int argc, char *argv[]) {
 		}
 		scr->refreshScr();
 		cmd=scr->getPrompt();
-		if(cmd[0] == '/') {
+		   if(cmd[0] == '/') {
 			if(cmd.compare("/quit") == 0) {
 				handler->disconnect();
 				quit = true;
@@ -49,9 +61,11 @@ int main(int argc, char *argv[]) {
 				handler->nick(cmd.substr(6));
 			else if(cmd.compare(0, 8, "/refresh") == 0)
 				handler->refresh();
-		} else {
+			else if(cmd.compare(0, 6, "/join ") == 0)
+				handler->join(cmd.substr(6));
+		   } else {
 			handler->sendChat(cmd);
-		}
+		   }
 	}
 	delete scr;
 	delete handler;

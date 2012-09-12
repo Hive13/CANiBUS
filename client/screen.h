@@ -23,6 +23,8 @@ public:
 	void updateChatWindow();
 	void updateLobbyTitle();
 	void updateLobbyWindow();
+	void updateConfigWindow();
+	void resize();
 	void refreshScr();
 	std::string getPrompt();
 	void addChat(CanibusMsg *msg);
@@ -31,8 +33,10 @@ public:
 	void updateLobby() { lobbyUpdated = true; }
 	void updatePrompt() { promptUpdated = true; }
 	void updateChat() { chatUpdated = true; }
+	void updateConfig() { configUpdated = true; }
 private:
-	bool promptUpdated, lobbyUpdated, chatUpdated;
+	int m_row, m_col;
+	bool promptUpdated, lobbyUpdated, chatUpdated, configUpdated;
 	CanibusState *m_state;
 	CanibusLogger *logger;
 	std::string m_command;
@@ -41,6 +45,7 @@ private:
 	WINDOW *m_promptWin;
 	WINDOW *m_chatWin;
 	WINDOW *m_lobbyWin;
+	WINDOW *m_configWin;
 };
 
 #endif

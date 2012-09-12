@@ -99,8 +99,11 @@ main.o: main.cc main.h /usr/include/stdio.h /usr/include/features.h \
  /usr/include/c++/4.5/bits/istream.tcc /usr/include/c++/4.5/sstream \
  /usr/include/c++/4.5/bits/sstream.tcc screen.h /usr/include/ncurses.h \
  /usr/include/ncurses_dll.h /usr/include/unctrl.h /usr/include/curses.h \
- /usr/include/c++/4.5/stack /usr/include/c++/4.5/bits/stl_stack.h \
- canibusmsg.h
+ /usr/include/c++/4.5/stack /usr/include/c++/4.5/bits/stl_stack.h state.h \
+ canibusmsg.h /usr/include/signal.h /usr/include/bits/signum.h \
+ /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h \
+ /usr/include/bits/sigstack.h /usr/include/sys/ucontext.h \
+ /usr/include/bits/sigthread.h
 
 main.h:
 
@@ -428,4 +431,20 @@ screen.h:
 
 /usr/include/c++/4.5/bits/stl_stack.h:
 
+state.h:
+
 canibusmsg.h:
+
+/usr/include/signal.h:
+
+/usr/include/bits/signum.h:
+
+/usr/include/bits/sigaction.h:
+
+/usr/include/bits/sigcontext.h:
+
+/usr/include/bits/sigstack.h:
+
+/usr/include/sys/ucontext.h:
+
+/usr/include/bits/sigthread.h:

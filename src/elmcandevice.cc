@@ -39,10 +39,9 @@ void ELMCanDevice::init()
 	}
 }
 
-std::string ELMCanDevice::port()
+void ELMCanDevice::setSerial(Serial *serial)
 {
-	if(!m_serial)
-		return "";
-	return m_serial->port();
+	m_serial = serial;
+	setProperty("port", m_serial->port(), this);
 }
 

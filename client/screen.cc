@@ -1,3 +1,6 @@
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <stdio.h>
 #include <ncurses.h>
 
 #include <string>
@@ -10,7 +13,7 @@
 
 Screen::Screen()
 {
-	int row, col;
+	logger = new CanibusLogger("screen_errlog.txt");
 
 	initscr();	// Starts curses mode
 	keypad(stdscr, TRUE);	// Enable F1, F2..
@@ -25,16 +28,12 @@ Screen::Screen()
 		init_pair(3, COLOR_GREEN, -1);
 	}
 	
-	getmaxyx(stdscr,row,col);
-	m_promptWin = newwin(1, col, row-1, 0);
-	m_chatWin = newwin( 9, col, row-10, 0 );
-	m_lobbyWin = newwin( row-(row-8), col, 1, 0 );
+	m_promptWin = 0;
+	m_chatWin = 0;
+	m_lobbyWin = 0;
+	m_configWin = 0;
+	resize();
 
-	promptUpdated = true;
-	chatUpdated = true;
-	lobbyUpdated = true;
-
-	logger = new CanibusLogger("screen_errlog.txt");
 }
 
 Screen::~Screen()
@@ -43,17 +42,64 @@ Screen::~Screen()
 	delete logger;
 }
 
+void Screen::resize()
+{
+	int row, col;
+	struct winsize ts;
+	ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
+	resizeterm(ts.ws_row, ts.ws_col);
+	getmaxyx(stdscr,row,col);
+	m_row = row;
+	m_col = col;
+	if(m_promptWin) 
+		mvwin(m_promptWin, row-1, 0);
+	else
+		m_promptWin = newwin(1, col, row-1, 0);
+	if(m_chatWin)
+		mvwin(m_chatWin, row-10, 0);
+	else
+		m_chatWin = newwin( 9, col, row-10, 0 );
+
+	if(m_lobbyWin)
+		wresize(m_lobbyWin, row-11, col);
+	else
+		m_lobbyWin = newwin( row-11, col, 1, 0 );
+	if(m_configWin)
+		wresize(m_configWin, row-10, col );
+	else
+		m_configWin = newwin( row-10, col, 0, 0 );
+
+	promptUpdated = true;
+	chatUpdated = true;
+	lobbyUpdated = true;
+	configUpdated = true;
+}
+
 void Screen::refreshScr()
 {
 	int row, col;
-	if(lobbyUpdated) {
-		updateLobbyTitle();
-		wclear(m_lobbyWin);
-		updateLobbyWindow();
-		wmove(m_promptWin, 0, 10 + m_command.length());
-		wrefresh(m_lobbyWin);
-		lobbyUpdated = false;
+	switch(m_state->status())
+	{
+	case CanibusState::Lobby:
+		if(lobbyUpdated) {
+			updateLobbyTitle();
+			wclear(m_lobbyWin);
+			updateLobbyWindow();
+			wmove(m_promptWin, 0, 10 + m_command.length());
+			wrefresh(m_lobbyWin);
+			lobbyUpdated = false;
+		}
+		break;
+	case CanibusState::Config:
+		if(configUpdated) {
+			wclear(m_configWin);
+			updateConfigWindow();
+			wrefresh(m_configWin);
+			configUpdated = false;
+		}
+		break;
 	}
+	/* Always on screen */
 	if(chatUpdated) {
 		wclear(m_chatWin);
 		updateChatWindow();
@@ -68,6 +114,11 @@ void Screen::refreshScr()
 		wrefresh(m_promptWin);
 		promptUpdated = false;
 	}
+}
+
+void Screen::updateConfigWindow()
+{
+	mvwprintw(m_configWin, 0, 1, "Config Options");
 }
 
 void Screen::updateLobbyTitle()
@@ -134,7 +185,6 @@ void Screen::updateChatWindow()
 
 void Screen::displayPrompt()
 {
-	int row, col;
 	wattron(m_promptWin, A_BOLD);
 	mvwprintw(m_promptWin, 0,0, "#CANiBUS>");
 	wattroff(m_promptWin, A_BOLD);
@@ -166,6 +216,9 @@ std::string Screen::getPrompt()
 		} else if(c == KEY_BACKSPACE) {
 			if(m_command.size() > 0)
 				m_command.erase(m_command.size()-1, 1);
+		} else if(c == KEY_RESIZE) {
+			resize();
+			refreshScr();
 		} else {
 			m_command += c;
 		}

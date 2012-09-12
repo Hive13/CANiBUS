@@ -6,7 +6,6 @@ CanDevice::CanDevice(int id) : SessionObject(id, SessionObject::SCan)
 {
 	setProperty("name", "Unknown", this);
 	setProperty("description", "No description available");
-	m_port = "";
 }
 
 CanDevice::~CanDevice()
@@ -18,6 +17,11 @@ CanDevice::~CanDevice()
 void CanDevice::init()
 {
 
+}
+
+std::string CanDevice::port()
+{
+	return getStringProperty("port");
 }
 
 void CanDevice::addSession(HackSession *session)

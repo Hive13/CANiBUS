@@ -21,6 +21,7 @@ public:
 	CanibusMsg *poll();
 	std::string serverVersion() { return m_serverVersion; }
 	void nick(std::string username);
+	void join(std::string canbusid);
 	void setState(CanibusState *state);
 	CanibusState *state() { return m_state; }
 	void setScreen(Screen *screen);
@@ -28,6 +29,7 @@ public:
 	void sendChat(std::string msg);
 	void disconnect();
 	void refresh();
+	int status();
 private:
 	bool m_finishedInit;
 	Socket *m_socket;

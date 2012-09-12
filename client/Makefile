@@ -49,7 +49,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_canibus_OBJECTS = main.$(OBJEXT) socket.$(OBJEXT) handler.$(OBJEXT) \
 	screen.$(OBJEXT) canibusmsg.$(OBJEXT) state.$(OBJEXT) \
-	logger.$(OBJEXT) clients.$(OBJEXT) canbusdevice.$(OBJEXT)
+	logger.$(OBJEXT) clients.$(OBJEXT) canbusdevice.$(OBJEXT) \
+	session.$(OBJEXT)
 canibus_OBJECTS = $(am_canibus_OBJECTS)
 canibus_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
@@ -156,10 +157,10 @@ top_srcdir = ..
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 canibus_SOURCES = main.cc socket.cc handler.cc screen.cc canibusmsg.cc \
-  state.cc logger.cc clients.cc canbusdevice.cc
+  state.cc logger.cc clients.cc canbusdevice.cc session.cc
 
 noinst_HEADERS = main.h socket.h handler.h screen.h canibusmsg.h \
-  state.h logger.h clients.h canbusdevice.h
+  state.h logger.h clients.h canbusdevice.h session.h
 
 canibus_LDADD = -ltinyxml -lncurses
 all: all-am
@@ -250,6 +251,7 @@ include ./$(DEPDIR)/handler.Po
 include ./$(DEPDIR)/logger.Po
 include ./$(DEPDIR)/main.Po
 include ./$(DEPDIR)/screen.Po
+include ./$(DEPDIR)/session.Po
 include ./$(DEPDIR)/socket.Po
 include ./$(DEPDIR)/state.Po
 

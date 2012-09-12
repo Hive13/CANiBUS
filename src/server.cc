@@ -205,7 +205,7 @@ void CanibusServer::joinHackSession(Client *client, unsigned int canbusId)
 			return;
 		}
 		session->addClient(client);
-		ioWrite(std::string("<canibusd><updatesessionlist type=\"edit\"><session id=\"") + itoa(session->id()) + "\" clients=\"" + itoa(session->clients()) + "\" private=\"" + itoa(session->getBoolProperty("private")) + "\"/></updatesessionlist></canibusd>\n");
+		ioWrite(std::string("<canibusd><updatehacksessionlist type=\"edit\"><session id=\"") + itoa(session->id()) + "\" canbusid=\"" + itoa(session->candevice()->id()) + " clients=\"" + itoa(session->clients()) + "\" private=\"" + itoa(session->getBoolProperty("private")) + "\"/></updatehacksessionlist></canibusd>\n");
 		return;
 	}
 
@@ -225,7 +225,7 @@ void CanibusServer::joinHackSession(Client *client, unsigned int canbusId)
 
 	session->addClient(client, true);
 
-	ioWrite(std::string("<canibusd><updatesessionlist type=\"edit\"><session id=\"")+ itoa(session->id()) + "\" clients=\"" + itoa(session->clients()) + "\" private=\"" + itoa(session->getBoolProperty("private")) + "\"/></updatesessionlist></canibusd>\n");
+	ioWrite(std::string("<canibusd><updatehacksessionlist type=\"edit\"><session id=\"")+ itoa(session->id()) + "\" canbusid=\"" + itoa(session->candevice()->id()) + " clients=\"" + itoa(session->clients()) + "\" private=\"" + itoa(session->getBoolProperty("private")) + "\"/></updatehacksessionlist></canibusd>\n");
 }	
 
 Client *CanibusServer::newClient(Socket *socket, const std::string &name)
@@ -481,6 +481,9 @@ void CanibusServer::processCommands(Client *cInput, const std::string data2)
 				case 'r':
 					initCanbusDevices();
 					sendHackSessionList(cInput);
+					return;
+				case 'j':
+					joinHackSession(cInput, atol(data2.substr(2).c_str()));
 					return;
 				default:
 					cInput->ioNoSuchCmd("You are not within a HackSession");

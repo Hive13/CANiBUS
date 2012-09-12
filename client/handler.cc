@@ -7,6 +7,7 @@
 #include "logger.h"
 #include "clients.h"
 #include "canbusdevice.h"
+#include "session.h"
 
 CanibusHandler::CanibusHandler(Socket *socket)
 {
@@ -29,6 +30,7 @@ void CanibusHandler::setScreen(Screen *screen)
 {
 	m_screen = screen;
 	m_screen->setState(m_state);
+	m_state->setStatus(CanibusState::Lobby);
 }
 
 void CanibusHandler::disconnect()
@@ -88,6 +90,7 @@ bool CanibusHandler::parseServerId(const char *packet)
 
 CanibusMsg *CanibusHandler::processMsg(const char *packet)
 {
+	bool validXml = false;
 	CanibusMsg *msg = 0;
 	if(!validatePacket(packet)) 
 		return 0;
@@ -97,6 +100,7 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 	TiXmlElement *client = m_xmlRoot->FirstChild("client").Element();
 	TiXmlElement *deleteclient = m_xmlRoot->FirstChild("deleteclient").Element();
 	TiXmlElement *finishedinit = m_xmlRoot->FirstChild("finishedinit").Element();
+	TiXmlElement *sessionupdate = m_xmlRoot->FirstChild("hacksessionupdate").Element();
 	TiXmlHandle updatehacksessionlist = m_xmlRoot->FirstChild("updatehacksessionlist");
 
 	if(emsg) {
@@ -109,7 +113,33 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 		msg->setClientId(atoi(clientid));
 		msg->setAuthor(author);
 		msg->setValue(value);
-	} else if(client) { // This is always us
+		validXml = true;
+	} 
+	if(sessionupdate) {
+		const char *sessionid = sessionupdate->Attribute("sessionid");
+		const char *status = sessionupdate->Attribute("status");
+		const char *desc = sessionupdate->Attribute("description");
+		const char *master = sessionupdate->Attribute("master");
+		const char *max = sessionupdate->Attribute("maxclients");
+		const char *priv = sessionupdate->Attribute("private");
+		const char *clients = sessionupdate->Attribute("clients");
+		CanibusSession *session = new CanibusSession(atoi(sessionid));
+		if(status)
+			session->setStatus(status);
+		if(desc)
+			session->setDesc(desc);
+		if(master)
+			session->setMasterId(atoi(master));
+		if(max)
+			session->setMaxClients(atoi(max));
+		if(priv)
+			session->setPrivate(atoi(priv));
+		if(clients)
+			session->setClientCount(atoi(clients));
+		m_state->updateSession(session);
+		validXml = true;
+	}
+	if(client) { // This is always us
 		const char *clientid = client->Attribute("clientid");
 		const char *cookie = client->Attribute("cookie");
 		CanibusClient *cInfo = new CanibusClient(atoi(clientid));
@@ -117,23 +147,34 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			cInfo->setCookie(cookie);
 		cInfo->setName(m_state->nick());
 		m_state->updateClient(cInfo);
-	} else if(clientUpdate) {
+		validXml = true;
+	} 
+	if(clientUpdate) {
+	   int status, updates = 0;
+	   CanibusClient *oldUser = 0;
+	   CanibusClient *cInfo = 0;
+	   for(clientUpdate; clientUpdate; clientUpdate = clientUpdate->NextSiblingElement()) {
+		if(std::string(clientUpdate->Value()).compare("clientupdate") != 0)
+			continue;
 		const char *clientid = clientUpdate->Attribute("clientid");
 		const char *name = clientUpdate->Attribute("name");
 		const char *host = clientUpdate->Attribute("host");
 		const char *session = clientUpdate->Attribute("session");
-		CanibusClient *cInfo = new CanibusClient(atoi(clientid));
+		cInfo = new CanibusClient(atoi(clientid));
 		if(name)
 			cInfo->setName(name);
 		if(host)
 			cInfo->setHost(host);
 		if(session)
 			cInfo->setSession(atoi(session));
-		CanibusClient *oldUser = m_state->findClientById(cInfo->id());
+		oldUser = m_state->findClientById(cInfo->id());
+		status = m_state->updateClient(cInfo);
+		updates++;
+	    }
+	    if(updates == 1) {
 		std::string tmpName;
 		if(oldUser)
 			tmpName = oldUser->name();
-		int status = m_state->updateClient(cInfo);
 		if(status == CLIENT_NICK_CHANGE && oldUser) {
 			msg = new CanibusMsg();
 			msg->setType("chat");
@@ -143,7 +184,10 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			msg->setType("chat");
 			msg->setValue(cInfo->name() + " has joined.");
 		}
-	} else if (deleteclient) {
+	    }
+  	    validXml = true;
+	}
+	if (deleteclient) {
 		const char *clientid = deleteclient->Attribute("clientid");
 		CanibusClient *left = m_state->findClientById(atoi(clientid));
 		if(left) {
@@ -152,10 +196,15 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			msg->setType("chat");
 			msg->setValue(left->name() + " has disconnected");
 		}
-	} else if(updatehacksessionlist.ToElement()) {
+		validXml = true;
+	}
+	if(updatehacksessionlist.ToElement()) {
 		m_state->clearDevices();
 		TiXmlElement *canbus = updatehacksessionlist.FirstChild("canbus").Element();
+		TiXmlElement *session = updatehacksessionlist.FirstChild("session").Element();
 		for(canbus; canbus; canbus = canbus->NextSiblingElement()) {
+			if(std::string(canbus->Value()).compare("canbus") != 0)
+				continue;
 			const char *id = canbus->Attribute("id");
 			const char *type = canbus->Attribute("type");
 			const char *desc = canbus->Attribute("description");
@@ -164,17 +213,42 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			canbus->setDesc(desc);
 			m_state->updateCanbusDevice(canbus);
 		}
+		for(session; session; session = session->NextSiblingElement()) {
+			if(std::string(session->Value()).compare("session") != 0)
+				continue;
+			const char *id = session->Attribute("id");
+			const char *status = session->Attribute("status");
+			const char *canbusid = session->Attribute("canbusid");
+			const char *clients = session->Attribute("clients");
+			const char *priv = session->Attribute("private");
+			CanibusSession *hax = new CanibusSession(atoi(id));
+			if(status)
+				hax->setStatus(status);
+			if(clients)
+				hax->setClientCount(atoi(clients));
+			if(priv)
+				hax->setPrivate(atoi(priv));
+			if(canbusid) {
+				CanbusDevice *can = m_state->findCanbusDeviceById(atoi(canbusid));
+				if(can)
+					hax->setCanbus(can);
+			}
+			m_state->updateSession(hax);
+		}
 		m_screen->updateLobby();
-	} if (finishedinit) {
+		validXml = true;
+	} 
+	if (finishedinit) {
 		m_finishedInit = true;
 		msg = new CanibusMsg();
 		msg->setType("chat");
 		std::ostringstream oss;
 		oss <<"There are " << m_state->clients().size() << " client(s) connected.";
 		msg->setValue(oss.str());
-	} else {
-		logger->log(m_xmlDoc);
+		validXml = true;
 	}
+	if(!validXml) 
+		logger->log(m_xmlDoc);
 	return msg;
 }
 
@@ -194,6 +268,11 @@ void CanibusHandler::nick(std::string username)
 	m_socket->ioWrite(".n"+username);
 }
 
+void CanibusHandler::join(std::string canbusid)
+{
+	m_socket->ioWrite(".sj"+canbusid);
+}
+
 void CanibusHandler::refresh()
 {
 	m_socket->ioWrite(".sr");
@@ -210,3 +289,11 @@ void CanibusHandler::sendChat(std::string msg)
 {
 	m_socket->ioWrite(msg);
 }
+
+int CanibusHandler::status()
+{
+	if(!m_state)
+		return 0;
+	return m_state->status();
+}
+

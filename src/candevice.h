@@ -15,10 +15,9 @@ public:
 	void init();
 	std::vector<HackSession *>sessions() { return m_sessions; }
 	void addSession(HackSession *session);
-	std::string port() { return m_port; }
+	std::string port();
 private:
 	std::vector<HackSession *>m_sessions;
-	std::string m_port;
 };
 
 class CanbusSimulator : public CanDevice

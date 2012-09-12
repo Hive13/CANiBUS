@@ -11,7 +11,7 @@ class ELMCanDevice : public CanDevice
 public:
 	ELMCanDevice(int id);
 	void init();
-	void setSerial(Serial *serial) { m_serial = serial; }
+	void setSerial(Serial *serial);
 	Serial *serial() { return m_serial; }
 	void setVersion(std::string version) { m_version = version; }
 	std::string version() { return m_version; }

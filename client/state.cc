@@ -1,10 +1,12 @@
 #include "state.h"
 #include "clients.h"
 #include "canbusdevice.h"
+#include "session.h"
 #include "logger.h"
 
 CanibusState::CanibusState()
 {
+	m_status = Init;
 	logger = new CanibusLogger("state_errlog.txt");
 }
 
@@ -49,6 +51,15 @@ CanibusClient *CanibusState::findClientById(int id)
 	return 0;
 }
 
+CanibusSession *CanibusState::findSessionById(int id)
+{
+	CanibusSession *session = 0;
+	for(std::vector<CanibusSession *>::iterator it = m_sessions.begin(); it != m_sessions.end() && (session = *it); ++ it)
+		if (session->id() == id)
+			return session;
+	return 0;
+}
+
 void CanibusState::delClient(CanibusClient *client)
 {
 	for(std::vector<CanibusClient *>::iterator it = m_clients.begin() ; it != m_clients.end() && (*it) ; ++it)
@@ -56,17 +67,32 @@ void CanibusState::delClient(CanibusClient *client)
 			m_clients.erase(it);
 }
 
+int CanibusState::updateSession(CanibusSession *sessionInfo)
+{
+	CanibusSession *knownSession = findSessionById(sessionInfo->id());
+	if(knownSession) {
+		if(sessionInfo->status().size() > 0)
+			knownSession->setStatus(sessionInfo->status());
+		if(sessionInfo->clientCount() > -1)
+			knownSession->setClientCount(sessionInfo->clientCount());
+		if(sessionInfo->isPrivate()) // prob wont turn off
+			knownSession->setPrivate(sessionInfo->isPrivate());
+		if(sessionInfo->canbusDevice())
+			knownSession->setCanbus(sessionInfo->canbusDevice());
+	} else {
+		m_sessions.push_back(sessionInfo);
+	}
+}
+
 int CanibusState::updateCanbusDevice(CanbusDevice *cbInfo)
 {
 	CanbusDevice *knownCanbus = findCanbusDeviceById(cbInfo->id());
 	if(knownCanbus) {
-logger->log("Updating CAN %d\n", knownCanbus->id());
 		if(cbInfo->type().size() > 0)
 			knownCanbus->setType(cbInfo->type());
 		if(cbInfo->desc().size() > 0)
 			knownCanbus->setDesc(cbInfo->desc());
 	} else {
-logger->log("Added CAN\n");
 		m_canbusDevices.push_back(cbInfo);
 	}
 }

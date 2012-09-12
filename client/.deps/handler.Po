@@ -108,7 +108,7 @@ handler.o: handler.cc /usr/include/c++/4.5/sstream \
  /usr/include/c++/4.5/cstdio \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/basic_file.h \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/c++io.h \
- /usr/include/c++/4.5/bits/fstream.tcc clients.h canbusdevice.h
+ /usr/include/c++/4.5/bits/fstream.tcc clients.h canbusdevice.h session.h
 
 /usr/include/c++/4.5/sstream:
 
@@ -455,3 +455,5 @@ logger.h:
 clients.h:
 
 canbusdevice.h:
+
+session.h:

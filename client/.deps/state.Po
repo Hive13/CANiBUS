@@ -54,15 +54,16 @@ state.o: state.cc state.h /usr/include/c++/4.5/string \
  /usr/include/c++/4.5/bits/stl_uninitialized.h \
  /usr/include/c++/4.5/bits/stl_vector.h \
  /usr/include/c++/4.5/bits/stl_bvector.h \
- /usr/include/c++/4.5/bits/vector.tcc clients.h canbusdevice.h logger.h \
- /usr/include/tinyxml.h /usr/include/libio.h /usr/include/_G_config.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
- /usr/include/bits/stdio.h /usr/include/bits/stdio2.h \
- /usr/include/stdlib.h /usr/include/bits/waitflags.h \
- /usr/include/bits/waitstatus.h /usr/include/sys/types.h \
- /usr/include/sys/select.h /usr/include/bits/select.h \
- /usr/include/bits/sigset.h /usr/include/sys/sysmacros.h \
- /usr/include/alloca.h /usr/include/bits/stdlib.h /usr/include/string.h \
+ /usr/include/c++/4.5/bits/vector.tcc clients.h canbusdevice.h session.h \
+ logger.h /usr/include/tinyxml.h /usr/include/libio.h \
+ /usr/include/_G_config.h /usr/include/bits/stdio_lim.h \
+ /usr/include/bits/sys_errlist.h /usr/include/bits/stdio.h \
+ /usr/include/bits/stdio2.h /usr/include/stdlib.h \
+ /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
+ /usr/include/sys/types.h /usr/include/sys/select.h \
+ /usr/include/bits/select.h /usr/include/bits/sigset.h \
+ /usr/include/sys/sysmacros.h /usr/include/alloca.h \
+ /usr/include/bits/stdlib.h /usr/include/string.h \
  /usr/include/bits/string3.h /usr/include/assert.h \
  /usr/include/c++/4.5/iostream /usr/include/c++/4.5/ostream \
  /usr/include/c++/4.5/ios /usr/include/c++/4.5/bits/ios_base.h \
@@ -256,6 +257,8 @@ state.h:
 clients.h:
 
 canbusdevice.h:
+
+session.h:
 
 logger.h:
 
