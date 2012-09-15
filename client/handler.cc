@@ -8,6 +8,7 @@
 #include "clients.h"
 #include "canbusdevice.h"
 #include "session.h"
+#include "options.h"
 
 CanibusHandler::CanibusHandler(Socket *socket)
 {
@@ -88,6 +89,14 @@ bool CanibusHandler::parseServerId(const char *packet)
 	return true;
 }
 
+CanibusMsg *CanibusHandler::systemMsg(std::string data)
+{
+	CanibusMsg *msg = new CanibusMsg;
+	msg->setType("chat");
+	msg->setValue(data);
+	return msg;
+}
+
 CanibusMsg *CanibusHandler::processMsg(const char *packet)
 {
 	bool validXml = false;
@@ -101,7 +110,9 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 	TiXmlElement *deleteclient = m_xmlRoot->FirstChild("deleteclient").Element();
 	TiXmlElement *finishedinit = m_xmlRoot->FirstChild("finishedinit").Element();
 	TiXmlElement *sessionupdate = m_xmlRoot->FirstChild("hacksessionupdate").Element();
+	TiXmlElement *deletesession = m_xmlRoot->FirstChild("deletesession").Element();
 	TiXmlHandle updatehacksessionlist = m_xmlRoot->FirstChild("updatehacksessionlist");
+	TiXmlHandle configupdate = m_xmlRoot->FirstChild("configupdate");
 
 	if(emsg) {
 		const char *type = emsg->Attribute("type");
@@ -139,6 +150,12 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 		m_state->updateSession(session);
 		validXml = true;
 	}
+	if(deletesession) {
+		const char *sessionid=deletesession->Attribute("sessionid");
+		if(sessionid) 
+			m_state->delSession(atoi(sessionid));
+		validXml = true;
+	}
 	if(client) { // This is always us
 		const char *clientid = client->Attribute("clientid");
 		const char *cookie = client->Attribute("cookie");
@@ -146,6 +163,7 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 		if(cookie)
 			cInfo->setCookie(cookie);
 		cInfo->setName(m_state->nick());
+		m_state->setOurClient(cInfo);
 		m_state->updateClient(cInfo);
 		validXml = true;
 	} 
@@ -175,14 +193,10 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 		std::string tmpName;
 		if(oldUser)
 			tmpName = oldUser->name();
-		if(status == CLIENT_NICK_CHANGE && oldUser) {
-			msg = new CanibusMsg();
-			msg->setType("chat");
-			msg->setValue(tmpName +" is now known as " + cInfo->name());
+		if(status == CLIENT_NICK_CHANGE && oldUser && tmpName.size() > 0) {
+			msg = systemMsg(tmpName +" is now known as " + cInfo->name());
 		} else if (status == CLIENT_ADDED && m_finishedInit) {
-			msg = new CanibusMsg();
-			msg->setType("chat");
-			msg->setValue(cInfo->name() + " has joined.");
+			msg = systemMsg(cInfo->name() + " has joined.");
 		}
 	    }
   	    validXml = true;
@@ -198,8 +212,51 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 		}
 		validXml = true;
 	}
+	if(configupdate.ToElement()) {
+		const char *sessionid = configupdate.ToElement()->Attribute("sessionid");
+		if(!sessionid) {
+			logger->log("Invalid session id");
+			logger->log(m_xmlDoc);
+			msg = systemMsg("Received invalid session id");
+		} else {
+		CanibusSession *session = m_state->findSessionById(atoi(sessionid));
+		if(!session) {
+			logger->log("Could not find session id: %s\n", sessionid);
+			msg = systemMsg("Received an unknown session id");
+		} else {
+		m_state->setActiveSession(session);
+		m_state->setStatus(CanibusState::Config);
+		TiXmlElement *option = configupdate.FirstChild("option").Element();
+
+		for(option; option; option = option->NextSiblingElement()) {
+			if(std::string(option->Value()).compare("option") != 0)
+				continue;
+			const char *type = option->Attribute("type");
+			const char *title = option->Attribute("title");
+			const char *command = option->Attribute("command");
+			const char *value = option->Attribute("value");
+			const char *edit = option->Attribute("edit");
+			CanibusOption *option = new CanibusOption(atoi(sessionid));
+			if(type)
+				option->setType(type);
+			if(title)
+				option->setTitle(title);
+			if(command)
+				option->setCommand(command);
+			if(value)
+				option->setValue(value);
+			if(edit)
+				option->setCanEdit(atoi(edit));
+			session->addOption(option);
+		}
+		validXml = true;
+		} // Need to fix nesting tabs indents
+		}
+	}
 	if(updatehacksessionlist.ToElement()) {
-		m_state->clearDevices();
+		const char *updateType = updatehacksessionlist.ToElement()->Attribute("type");
+		if(updateType && std::string(updateType).compare("full") == 0)
+			m_state->clearDevices();
 		TiXmlElement *canbus = updatehacksessionlist.FirstChild("canbus").Element();
 		TiXmlElement *session = updatehacksessionlist.FirstChild("session").Element();
 		for(canbus; canbus; canbus = canbus->NextSiblingElement()) {

@@ -8,6 +8,7 @@ class Socket;
 class Screen;
 class CanibusMsg;
 class CanibusState;
+class CanibusOption;
 class CanibusLogger;
 
 class CanibusHandler
@@ -27,6 +28,7 @@ public:
 	void setScreen(Screen *screen);
 	Screen *screen() { return m_screen; }
 	void sendChat(std::string msg);
+	CanibusMsg *systemMsg(std::string msg);
 	void disconnect();
 	void refresh();
 	int status();

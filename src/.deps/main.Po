@@ -21,16 +21,20 @@ main.o: main.cc /usr/include/signal.h /usr/include/features.h \
  /usr/include/sys/types.h /usr/include/sys/select.h \
  /usr/include/bits/select.h /usr/include/bits/time.h \
  /usr/include/sys/sysmacros.h /usr/include/alloca.h \
- /usr/include/bits/stdlib.h /usr/include/c++/4.5/iostream \
+ /usr/include/bits/stdlib.h /usr/include/stdio.h /usr/include/libio.h \
+ /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio.h /usr/include/bits/stdio2.h \
+ /usr/include/c++/4.5/iostream \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/c++config.h \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/os_defines.h \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/cpu_defines.h \
  /usr/include/c++/4.5/ostream /usr/include/c++/4.5/ios \
  /usr/include/c++/4.5/iosfwd /usr/include/c++/4.5/bits/stringfwd.h \
  /usr/include/c++/4.5/bits/postypes.h /usr/include/c++/4.5/cwchar \
- /usr/include/c++/4.5/cstddef /usr/include/wchar.h /usr/include/stdio.h \
- /usr/include/bits/wchar.h /usr/include/bits/wchar2.h \
- /usr/include/c++/4.5/exception /usr/include/c++/4.5/bits/char_traits.h \
+ /usr/include/c++/4.5/cstddef /usr/include/bits/wchar.h \
+ /usr/include/bits/wchar2.h /usr/include/c++/4.5/exception \
+ /usr/include/c++/4.5/bits/char_traits.h \
  /usr/include/c++/4.5/bits/stl_algobase.h \
  /usr/include/c++/4.5/bits/functexcept.h \
  /usr/include/c++/4.5/exception_defines.h \
@@ -175,6 +179,22 @@ main.o: main.cc /usr/include/signal.h /usr/include/features.h \
 
 /usr/include/bits/stdlib.h:
 
+/usr/include/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/bits/stdio2.h:
+
 /usr/include/c++/4.5/iostream:
 
 /usr/include/c++/4.5/x86_64-linux-gnu/bits/c++config.h:
@@ -196,10 +216,6 @@ main.o: main.cc /usr/include/signal.h /usr/include/features.h \
 /usr/include/c++/4.5/cwchar:
 
 /usr/include/c++/4.5/cstddef:
-
-/usr/include/wchar.h:
-
-/usr/include/stdio.h:
 
 /usr/include/bits/wchar.h:
 

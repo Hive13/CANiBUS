@@ -8,8 +8,11 @@
 #include "canibusmsg.h"
 #include "screen.h"
 #include "state.h"
+#include "clients.h"
 #include "logger.h"
 #include "canbusdevice.h"
+#include "session.h"
+#include "options.h"
 
 Screen::Screen()
 {
@@ -118,7 +121,22 @@ void Screen::refreshScr()
 
 void Screen::updateConfigWindow()
 {
+	int row = 2;
+	int configRow, configCol;
+	getmaxyx(m_chatWin, configRow, configCol);
 	mvwprintw(m_configWin, 0, 1, "Config Options");
+	CanibusOption *option = 0;
+	std::vector<CanibusOption *>options = m_state->activeSession()->options();
+	for(std::vector<CanibusOption *>::iterator it = options.begin(); it != options.end() && (option = *it); ++it) {
+		mvwprintw(m_configWin, row, 6, option->title().c_str());
+		row++;
+	}
+	logger->log("MasterID==%d my id==%d\n", m_state->activeSession()->masterId(), m_state->me()->id());
+	if(m_state->activeSession()->masterId() == m_state->me()->id()) {
+		mvwprintw(m_configWin, configRow-1, 1, "Use /start when done configuring options");
+	} else {
+		mvwprintw(m_configWin, configRow-1, 1, "Waiting for session master to finish config options");
+	}
 }
 
 void Screen::updateLobbyTitle()

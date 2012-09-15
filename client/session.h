@@ -2,8 +2,10 @@
 #define __CANIBUS_SESSION_H__
 
 #include <string>
+#include <vector>
 
 class CanbusDevice;
+class CanibusOption;
 
 class CanibusSession
 {
@@ -25,12 +27,15 @@ public:
 	int masterId() { return m_masterId; }
 	void setMaxClients(int max) { m_maxClients = max; }
 	int maxClients() { return m_maxClients; }
+	void addOption(CanibusOption *option) { m_options.push_back(option); }
+	std::vector<CanibusOption *>options() { return m_options; }
 private:
 	int m_id;
 	std::string m_status;
 	int m_numClients;
 	bool m_isPrivate;
 	CanbusDevice *m_canbusDevice;
+	std::vector<CanibusOption *> m_options;
 	std::string m_desc;
 	int m_masterId;
 	int m_maxClients;

@@ -8,7 +8,7 @@
 
 HackSession::HackSession(int id) : SessionObject(id, SHack)
 {
-
+	m_status = Config;
 }
 
 HackSession::~HackSession()
@@ -177,6 +177,22 @@ void HackSession::unsetChildProperties()
 		(*it)->unsetPropertiesChanged();
 }
 
+void HackSession::delClient(Client *client)
+{
+	Client *target;
+	for(std::vector<Client *>::iterator it = m_clients.begin() ; it != m_clients.end() && (target = *it) ; ++it)
+		if(target == client) {
+			if (m_master == client) {
+				m_master = 0;
+				setProperty("master", 0);
+			}
+			client->setBoolProperty("master", false, this);
+			client->setSession(0);
+			m_clients.erase(it);
+		}
+	setProperty("clients", m_clients.size() );
+}
+
 Client *HackSession::addClient(Client *client, bool isMaster)
 {
 	m_clients.push_back(client);
@@ -187,6 +203,8 @@ Client *HackSession::addClient(Client *client, bool isMaster)
 
 	client->setSession(this);
 	addToScope(client);
+
+	client->setBoolProperty("master", isMaster, this);
 
 	if(isMaster)
 	{
@@ -204,4 +222,11 @@ Client *HackSession::addClient(Client *client, bool isMaster)
 	}
 
 	return client;
+}
+
+void HackSession::electNewMaster()
+{
+	m_master = m_clients.front();
+	setProperty("master", m_master->id());
+		
 }

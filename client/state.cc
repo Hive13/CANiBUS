@@ -7,6 +7,7 @@
 CanibusState::CanibusState()
 {
 	m_status = Init;
+	m_me = 0;
 	logger = new CanibusLogger("state_errlog.txt");
 }
 
@@ -79,6 +80,12 @@ int CanibusState::updateSession(CanibusSession *sessionInfo)
 			knownSession->setPrivate(sessionInfo->isPrivate());
 		if(sessionInfo->canbusDevice())
 			knownSession->setCanbus(sessionInfo->canbusDevice());
+		if(sessionInfo->masterId() > -1)
+			knownSession->setMasterId(sessionInfo->masterId());
+		if(sessionInfo->desc().size() > 0)
+			knownSession->setDesc(sessionInfo->desc());
+		if(sessionInfo->maxClients() != knownSession->maxClients())
+			knownSession->setMaxClients(sessionInfo->maxClients());
 	} else {
 		m_sessions.push_back(sessionInfo);
 	}
@@ -104,4 +111,14 @@ CanbusDevice *CanibusState::findCanbusDeviceById(int id)
 		if (canbus->id() == id)
 			return canbus;
 	return 0;
+}
+
+void CanibusState::delSession(int sessionId)
+{
+	CanibusSession *session = 0;
+	for(std::vector<CanibusSession *>::iterator it = m_sessions.begin(); it != m_sessions.end() && (session = *it); ++it)
+		if(session->id() == sessionId) {
+			m_sessions.erase(it);
+			delete session;
+		}
 }

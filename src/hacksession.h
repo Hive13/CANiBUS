@@ -35,9 +35,12 @@ public:
 	void sendClientList(Client *client);
 
 	Client *addClient(Client *client, bool isMaster = false);
+	void delClient(Client *client);
+	void electNewMaster();
 
 	void setCanDevice(CanDevice *can) { m_candevice = can; }
 	CanDevice *candevice() { return m_candevice; }
+	Client *master() { return m_master; }
 private:
 	Status m_status;
 	Client *m_master;

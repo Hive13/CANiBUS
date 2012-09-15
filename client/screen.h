@@ -11,6 +11,8 @@ class CanibusState;
 class CanibusLogger;
 class CanbusDevice;
 class CanibusState;
+class CanibusSession;
+class CanibusClient;
 
 class Screen
 {

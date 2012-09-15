@@ -6,6 +6,7 @@
 #include <syslog.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <iostream>
 #include <string>
@@ -64,6 +65,8 @@ int main(int argc, char **argv)
 		server->setPort( atoi(argv[1]) );
 
 	CanibusListener *listener = new CanibusListener( server );
+
+	fprintf(stderr, "Server is up and running\n");
 
 	for(;;)
 	{

@@ -27,6 +27,7 @@ public:
 
 	void sendHackSessionList(Client *client);
 	void joinHackSession(Client *client, unsigned int canbusId);
+	void delHackSession(HackSession *session);
 
 	void initCanbusDevices();
 	CanDevice *findCanDeviceById(unsigned int id);

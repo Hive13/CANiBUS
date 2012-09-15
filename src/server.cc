@@ -188,6 +188,31 @@ CanDevice *CanibusServer::findCanDeviceById(unsigned int id)
 	return 0;
 }
 
+void CanibusServer::delHackSession(HackSession *session)
+{
+	ioWrite("<canibusd><deletesession sessionid=\"" + itoa(session->id()) + "\"/></canibusd>\n");
+	while(session->clients())
+	{
+		Client *client = 0;
+		for(std::vector<Client *>::iterator it = m_clients.begin(); it != m_clients.end() && (client = *it); ++it)
+			if(client->session() == session)
+			{
+				session->delClient(client);
+				delClient(client); // Maybe too harsh
+				break;
+			}
+	}
+
+	for(std::vector<HackSession *>::iterator it = m_hacksessions.begin() ; it != m_hacksessions.end() && (*it) ; ++it)
+		if (*it == session)
+		{
+			syslog( LOG_INFO, "del session: id=[%d], sessions=[%ld]", session->id(), m_hacksessions.size() - 1);
+			m_hacksessions.erase(it);
+			break;
+		}
+	delete session;
+}
+
 void CanibusServer::joinHackSession(Client *client, unsigned int canbusId)
 {
 	CanDevice *candevice = findCanDeviceById(canbusId);
@@ -287,6 +312,20 @@ void CanibusServer::delClient(Client *client)
 		if (*it == client)
 		{
 			removeFromScope(client);
+			HackSession *session = 0;
+			if(client->session()) {
+				session = client->session();
+				session->delClient(client);
+				if(session->master() == client && session->clients() > 0) 
+					session->electNewMaster();
+			}
+			if(session) {
+				if(session->clients() > 0)
+					sendXMLUpdates();
+				else
+					delHackSession(session);
+			}
+				
 			syslog( LOG_INFO, "del client: id=[%d], name=[%s], clients=[%ld]", client->id(), client->getStringProperty("name").c_str(), m_clients.size() - 1 );
 			printf("delClient %d/%ld\n", client->id(), m_clients.size() - 1);
 			delete client;

@@ -68,7 +68,7 @@ screen.o: screen.cc /usr/include/sys/ioctl.h /usr/include/features.h \
  /usr/include/c++/4.5/bits/vector.tcc /usr/include/c++/4.5/stack \
  /usr/include/c++/4.5/deque /usr/include/c++/4.5/bits/stl_deque.h \
  /usr/include/c++/4.5/bits/deque.tcc \
- /usr/include/c++/4.5/bits/stl_stack.h state.h logger.h \
+ /usr/include/c++/4.5/bits/stl_stack.h state.h clients.h logger.h \
  /usr/include/tinyxml.h /usr/include/stdlib.h \
  /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
  /usr/include/sys/types.h /usr/include/sys/select.h \
@@ -95,7 +95,7 @@ screen.o: screen.cc /usr/include/sys/ioctl.h /usr/include/features.h \
  /usr/include/c++/4.5/bits/codecvt.h /usr/include/c++/4.5/cstdio \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/basic_file.h \
  /usr/include/c++/4.5/x86_64-linux-gnu/bits/c++io.h \
- /usr/include/c++/4.5/bits/fstream.tcc canbusdevice.h
+ /usr/include/c++/4.5/bits/fstream.tcc canbusdevice.h session.h options.h
 
 /usr/include/sys/ioctl.h:
 
@@ -321,6 +321,8 @@ screen.h:
 
 state.h:
 
+clients.h:
+
 logger.h:
 
 /usr/include/tinyxml.h:
@@ -408,3 +410,7 @@ logger.h:
 /usr/include/c++/4.5/bits/fstream.tcc:
 
 canbusdevice.h:
+
+session.h:
+
+options.h:
