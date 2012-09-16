@@ -30,6 +30,7 @@ public:
 	void refreshScr();
 	std::string getPrompt();
 	void addChat(CanibusMsg *msg);
+	void clearChat();
 	void setState(CanibusState *state) { m_state = state; }
 	CanibusState *state() { return m_state; }
 	void updateLobby() { lobbyUpdated = true; }

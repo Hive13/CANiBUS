@@ -179,7 +179,8 @@ void HackSession::unsetChildProperties()
 
 void HackSession::delClient(Client *client)
 {
-	Client *target;
+	Client *target = 0;
+	fprintf(stderr, "DEBUG: delClients() m_clients.size()==%ld\n", m_clients.size());
 	for(std::vector<Client *>::iterator it = m_clients.begin() ; it != m_clients.end() && (target = *it) ; ++it)
 		if(target == client) {
 			if (m_master == client) {

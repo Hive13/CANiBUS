@@ -190,15 +190,16 @@ CanDevice *CanibusServer::findCanDeviceById(unsigned int id)
 
 void CanibusServer::delHackSession(HackSession *session)
 {
+	fprintf(stderr, "DEBUG: Remove empty hack session\n");
 	ioWrite("<canibusd><deletesession sessionid=\"" + itoa(session->id()) + "\"/></canibusd>\n");
 	while(session->clients())
 	{
 		Client *client = 0;
 		for(std::vector<Client *>::iterator it = m_clients.begin(); it != m_clients.end() && (client = *it); ++it)
-			if(client->session() == session)
+			if(client->hacksession() == session)
 			{
 				session->delClient(client);
-				delClient(client); // Maybe too harsh
+				//delClient(client); // Maybe too harsh
 				break;
 			}
 	}
@@ -210,6 +211,9 @@ void CanibusServer::delHackSession(HackSession *session)
 			m_hacksessions.erase(it);
 			break;
 		}
+
+	if(session->candevice())
+		session->candevice()->delSession(session);
 	delete session;
 }
 
@@ -230,7 +234,7 @@ void CanibusServer::joinHackSession(Client *client, unsigned int canbusId)
 			return;
 		}
 		session->addClient(client);
-		ioWrite(std::string("<canibusd><updatehacksessionlist type=\"edit\"><session id=\"") + itoa(session->id()) + "\" canbusid=\"" + itoa(session->candevice()->id()) + " clients=\"" + itoa(session->clients()) + "\" private=\"" + itoa(session->getBoolProperty("private")) + "\"/></updatehacksessionlist></canibusd>\n");
+		ioWrite(std::string("<canibusd><updatehacksessionlist type=\"edit\"><session id=\"") + itoa(session->id()) + "\" canbusid=\"" + itoa(session->candevice()->id()) + "\" clients=\"" + itoa(session->clients()) + "\" private=\"" + itoa(session->getBoolProperty("private")) + "\"/></updatehacksessionlist></canibusd>\n");
 		return;
 	}
 
@@ -250,7 +254,7 @@ void CanibusServer::joinHackSession(Client *client, unsigned int canbusId)
 
 	session->addClient(client, true);
 
-	ioWrite(std::string("<canibusd><updatehacksessionlist type=\"edit\"><session id=\"")+ itoa(session->id()) + "\" canbusid=\"" + itoa(session->candevice()->id()) + " clients=\"" + itoa(session->clients()) + "\" private=\"" + itoa(session->getBoolProperty("private")) + "\"/></updatehacksessionlist></canibusd>\n");
+	ioWrite(std::string("<canibusd><updatehacksessionlist type=\"edit\"><session id=\"")+ itoa(session->id()) + "\" canbusid=\"" + itoa(session->candevice()->id()) + "\" clients=\"" + itoa(session->clients()) + "\" private=\"" + itoa(session->getBoolProperty("private")) + "\"/></updatehacksessionlist></canibusd>\n");
 }	
 
 Client *CanibusServer::newClient(Socket *socket, const std::string &name)
@@ -307,14 +311,15 @@ void CanibusServer::setClientName(Client *client, const std::string &name)
 
 void CanibusServer::delClient(Client *client)
 {
+	fprintf(stderr, "DEBUG: delClient(%d)\n", client->id());
 	ioWrite("<canibusd><deleteclient clientid=\"" + itoa(client->id()) + "\"/></canibusd>\n");
 	for(std::vector<Client *>::iterator it = m_clients.begin(); it != m_clients.end() && (*it) ; ++it)
 		if (*it == client)
 		{
 			removeFromScope(client);
 			HackSession *session = 0;
-			if(client->session()) {
-				session = client->session();
+			if(client->hacksession()) {
+				session = client->hacksession();
 				session->delClient(client);
 				if(session->master() == client && session->clients() > 0) 
 					session->electNewMaster();
@@ -372,7 +377,8 @@ void CanibusServer::ioWrite(const std::string &data, const bool &inLobby)
 {
 	Client *client = 0;
 	for(std::vector<Client *>::iterator it = m_clients.begin(); it != m_clients.end() && (client = *it) ; ++it)
-		if ( !(inLobby && client->hacksession()) )
+		if(inLobby && !client->hacksession())
+		//if ( !(inLobby && client->hacksession()) )
 			client->ioWrite(data);
 }
 
@@ -493,6 +499,7 @@ void CanibusServer::processInput(Socket *socket, const std::string data)
 void CanibusServer::processCommands(Client *cInput, const std::string data2)
 {
         char *data = (char *)data2.c_str();
+	cInput->setRequestedUpdate(false);
 
 	// The following commands are _always_ available.
 	switch(data[0])

@@ -131,7 +131,6 @@ void Screen::updateConfigWindow()
 		mvwprintw(m_configWin, row, 6, option->title().c_str());
 		row++;
 	}
-	logger->log("MasterID==%d my id==%d\n", m_state->activeSession()->masterId(), m_state->me()->id());
 	if(m_state->activeSession()->masterId() == m_state->me()->id()) {
 		mvwprintw(m_configWin, configRow-1, 1, "Use /start when done configuring options");
 	} else {
@@ -176,12 +175,18 @@ void Screen::updateChatWindow()
 			cmsg = m_lobbyChatLogs.top();
 			tmpStack.push(cmsg);
 			m_lobbyChatLogs.pop();
-			if(cmsg->author() != "Unknown") {
+			if(cmsg->id() > 0) {
+				std::string author = "<";
+				if(m_state->isMaster(cmsg->id()))
+					author += "@";
+				else
+					author += " ";
+				author += cmsg->author() + "> ";
 				if(has_colors() == FALSE) {
-					fmsg = "< " + cmsg->author() + "> " + cmsg->value();
+					fmsg = author + cmsg->value();
 					mvwprintw(m_chatWin, row-2-i, 1, fmsg.c_str());
 				} else {
-					fmsg = "< " + cmsg->author() + "> ";
+					fmsg = author;
 					attron(COLOR_PAIR(1));
 					mvwprintw(m_chatWin, row-2-i, 1, fmsg.c_str());
 					attroff(COLOR_PAIR(1));
@@ -189,7 +194,7 @@ void Screen::updateChatWindow()
 					mvwprintw(m_chatWin, row-2-i, 1+fmsg.size(), cmsg->value().c_str());
 					attroff(COLOR_PAIR(2));
 				}
-			} else { // systme message
+			} else { // system message
 				mvwprintw(m_chatWin, row-2-i, 1, (" ** " + cmsg->value()).c_str());
 			}
 		}
@@ -251,3 +256,8 @@ void Screen::addChat(CanibusMsg *msg)
 	chatUpdated = true;
 }
 
+void Screen::clearChat()
+{
+	std::stack<CanibusMsg *> empty;
+	std::swap(m_lobbyChatLogs, empty);
+}

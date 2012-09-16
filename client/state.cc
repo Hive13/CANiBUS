@@ -122,3 +122,11 @@ void CanibusState::delSession(int sessionId)
 			delete session;
 		}
 }
+
+bool CanibusState::isMaster(int id)
+{
+	if(m_activeSession && id && m_activeSession->masterId() == id)
+		return true;
+	return false;
+}
+

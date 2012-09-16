@@ -15,6 +15,7 @@ public:
 	void init();
 	std::vector<HackSession *>sessions() { return m_sessions; }
 	void addSession(HackSession *session);
+	void delSession(HackSession *session);
 	std::string port();
 private:
 	std::vector<HackSession *>m_sessions;

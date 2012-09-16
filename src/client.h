@@ -30,14 +30,11 @@ public:
 	void closeSocket();
 	void setSocket(Socket *socket);
 	Socket *socket() { return m_socket; }
-	void setSession(HackSession *session) { m_session = session; }
-	HackSession *session() { return m_session; }
 	void setRequestedUpdate(const bool request) { m_requestedUpdate = request; }
 	bool requestUpdate() { return m_requestedUpdate; }
 private:
 	bool m_requestedUpdate;
 	Socket *m_socket;
-	HackSession *m_session;
 };
 
 #endif

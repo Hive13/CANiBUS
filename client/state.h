@@ -19,6 +19,7 @@ public:
 	Status status() { return m_status; }
 	void setOurClient(CanibusClient *client) { m_me = client; }
 	CanibusClient *me() { return m_me; }
+	bool isMaster(int id);
 	void setNick(std::string username);
 	std::string nick() { return m_nick; }
 	int updateClient(CanibusClient *cInfo);

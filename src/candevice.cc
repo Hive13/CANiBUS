@@ -30,6 +30,16 @@ void CanDevice::addSession(HackSession *session)
 	setProperty("sessions", m_sessions.size());
 }
 
+void CanDevice::delSession(HackSession *session)
+{
+	if(!session)
+		return;
+	for(std::vector<HackSession *>::iterator it = m_sessions.begin() ; it != m_sessions.end() && (*it) ; ++it)
+		if(*it == session)
+			m_sessions.erase(it);
+	setProperty("sessions", m_sessions.size());
+}
+
 /*-------------------------------*/
 CanbusSimulator::CanbusSimulator(int id) : CanDevice(id)
 {

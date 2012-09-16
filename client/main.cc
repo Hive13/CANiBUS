@@ -48,7 +48,8 @@ int main(int argc, char *argv[]) {
 	handler->nick(username);
 	while(!quit) {
 		if((msg = handler->poll())) {
-			if(msg->type().compare("chat") == 0)
+			if(msg->type().compare("chat") == 0 ||
+			   msg->type().compare("error") == 0)
 				scr->addChat(msg);
 		}
 		scr->refreshScr();
@@ -63,6 +64,8 @@ int main(int argc, char *argv[]) {
 				handler->refresh();
 			else if(cmd.compare(0, 6, "/join ") == 0)
 				handler->join(cmd.substr(6));
+			else
+				scr->addChat(handler->systemMsg("Invalid command"));
 		   } else {
 			handler->sendChat(cmd);
 		   }

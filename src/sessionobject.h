@@ -18,6 +18,7 @@ public:
 	~SessionObject();
 
 	HackSession *hacksession();
+	void setSession(HackSession *session) { m_hacksession = session; }
 
 	void unsetPropertiesChanged();
 	void setProperty(const std::string &key, const std::string &value, SessionObject *scope = 0);
