@@ -117,9 +117,9 @@ void CanibusState::delSession(int sessionId)
 {
 	CanibusSession *session = 0;
 	for(std::vector<CanibusSession *>::iterator it = m_sessions.begin(); it != m_sessions.end() && (session = *it); ++it)
-		if(session->id() == sessionId) {
+		if(session && session->id() == sessionId) {
 			m_sessions.erase(it);
-			delete session;
+			//delete session;
 		}
 }
 

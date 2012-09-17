@@ -17,6 +17,7 @@
 Screen::Screen()
 {
 	logger = new CanibusLogger("screen_errlog.txt");
+	m_historyIndex = -1;
 
 	initscr();	// Starts curses mode
 	keypad(stdscr, TRUE);	// Enable F1, F2..
@@ -91,6 +92,7 @@ void Screen::refreshScr()
 			wmove(m_promptWin, 0, 10 + m_command.length());
 			wrefresh(m_lobbyWin);
 			lobbyUpdated = false;
+			promptUpdated = true;
 		}
 		break;
 	case CanibusState::Config:
@@ -99,6 +101,7 @@ void Screen::refreshScr()
 			updateConfigWindow();
 			wrefresh(m_configWin);
 			configUpdated = false;
+			promptUpdated = true;
 		}
 		break;
 	}
@@ -109,6 +112,7 @@ void Screen::refreshScr()
 		wmove(m_promptWin, 0, 10 + m_command.length());
 		wrefresh(m_chatWin);
 		chatUpdated = false;
+		promptUpdated = true;
 	}
 	if(promptUpdated) {
 		wclear(m_promptWin);
@@ -227,6 +231,24 @@ void Screen::centerWrite(std::string msg)
 	refresh();
 }
 
+std::string Screen::getHistory(int atIndex)
+{
+	std::string cmd;
+	std::string foundCmd;
+	std::stack<std::string>tmp;
+	int idx = 0;
+	for(; !m_cmdHistory.empty() && idx <= atIndex; m_cmdHistory.pop()) {
+		cmd = m_cmdHistory.top();
+		tmp.push(cmd);
+		if(idx == atIndex) 
+			foundCmd = cmd;
+		idx++;
+	}
+	for(; !tmp.empty(); tmp.pop()) 
+		m_cmdHistory.push(tmp.top());
+	return foundCmd;
+}
+
 std::string Screen::getPrompt()
 {
 	std::string cmd;
@@ -235,6 +257,9 @@ std::string Screen::getPrompt()
 	if(c != ERR) {
 		if(c == '\n' || c == '\r') {
 			cmd = m_command;
+			if(cmd.size() > 0)
+				m_cmdHistory.push(m_command);
+			m_historyIndex = -1;
 			m_command.clear();
 		} else if(c == KEY_BACKSPACE) {
 			if(m_command.size() > 0)
@@ -242,6 +267,22 @@ std::string Screen::getPrompt()
 		} else if(c == KEY_RESIZE) {
 			resize();
 			refreshScr();
+		} else if(c == KEY_UP) {
+			m_historyIndex++;
+			if(m_historyIndex >= m_cmdHistory.size())
+				m_historyIndex = m_cmdHistory.size()-1;
+			std::string tmp = getHistory(m_historyIndex);
+			if(tmp.size() > 0)
+				m_command = tmp;
+		} else if(c == KEY_DOWN) {
+			m_historyIndex--;
+			if(m_historyIndex < 0) {
+				m_historyIndex = -1;
+				m_command.clear();
+			}
+			std::string tmp = getHistory(m_historyIndex);
+			if(tmp.size() > 0)
+				m_command = tmp;
 		} else {
 			m_command += c;
 		}

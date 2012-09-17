@@ -156,8 +156,9 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 		}
 		if(std::string(elem->Value()).compare("deletesession") == 0) {
 			const char *sessionid=elem->Attribute("sessionid");
-			if(sessionid) 
-				m_state->delSession(atoi(sessionid));
+			// Removing for now, may not be needed
+			//if(sessionid) 
+				//m_state->delSession(atoi(sessionid));
 			validXml = true;
 		}
 		if(std::string(elem->Value()).compare("client") == 0) {
@@ -184,6 +185,7 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 				cInfo->setName(name);
 			if(host)
 				cInfo->setHost(host);
+			if(session)
 				cInfo->setSession(atoi(session));
 			oldUser = m_state->findClientById(cInfo->id());
 			if(oldUser)

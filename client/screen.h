@@ -29,6 +29,7 @@ public:
 	void resize();
 	void refreshScr();
 	std::string getPrompt();
+	std::string getHistory(int index);
 	void addChat(CanibusMsg *msg);
 	void clearChat();
 	void setState(CanibusState *state) { m_state = state; }
@@ -38,13 +39,14 @@ public:
 	void updateChat() { chatUpdated = true; }
 	void updateConfig() { configUpdated = true; }
 private:
-	int m_row, m_col;
+	int m_row, m_col, m_historyIndex;
 	bool promptUpdated, lobbyUpdated, chatUpdated, configUpdated;
 	CanibusState *m_state;
 	CanibusLogger *logger;
 	std::string m_command;
 	std::stack<CanibusMsg *>m_lobbyChatLogs;
 	std::stack<CanibusMsg *>m_chatLogs;
+	std::stack<std::string>m_cmdHistory;
 	WINDOW *m_promptWin;
 	WINDOW *m_chatWin;
 	WINDOW *m_lobbyWin;
