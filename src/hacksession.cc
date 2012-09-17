@@ -205,6 +205,7 @@ Client *HackSession::addClient(Client *client, bool isMaster)
 	client->setSession(this);
 	addToScope(client);
 
+	client->setProperty("session", m_id, this);
 	client->setBoolProperty("master", isMaster, this);
 
 	if(isMaster)

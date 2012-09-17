@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <cassert>
 
 #include "sessionobject.h"

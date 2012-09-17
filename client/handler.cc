@@ -39,6 +39,11 @@ void CanibusHandler::disconnect()
 	m_socket->ioWrite(".X");
 }
 
+void CanibusHandler::leave()
+{
+	m_socket->ioWrite(".x");
+}
+
 // Parses network packet into XML and ensures from CANiBUSd
 bool CanibusHandler::validatePacket(const char *packet)
 {
@@ -100,12 +105,13 @@ CanibusMsg *CanibusHandler::systemMsg(std::string data)
 CanibusMsg *CanibusHandler::processMsg(const char *packet)
 {
 	bool validXml = false;
+	std::string tmpName;
 	CanibusMsg *msg = 0;
 	if(!validatePacket(packet)) 
 		return 0;
 
 	TiXmlElement *elem = m_xmlRoot->FirstChild().Element();
-	logger->log(m_xmlDoc);
+	//logger->log(m_xmlDoc);
 	for(elem; elem; elem = elem->NextSiblingElement()) {
 		if(std::string(elem->Value()).compare("msg") == 0) {
 			const char *type = elem->Attribute("type");
@@ -145,9 +151,7 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			if(clients)
 				session->setClientCount(atoi(clients));
 			m_state->updateSession(session);
-			m_screen->clearChat();
 			m_screen->updateConfig();
-			m_screen->updateChat();
 			validXml = true;
 		}
 		if(std::string(elem->Value()).compare("deletesession") == 0) {
@@ -180,21 +184,36 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 				cInfo->setName(name);
 			if(host)
 				cInfo->setHost(host);
-			if(session)
 				cInfo->setSession(atoi(session));
 			oldUser = m_state->findClientById(cInfo->id());
-			status = m_state->updateClient(cInfo);
-			updates++;
-		    if(updates == 1) {
-			std::string tmpName;
 			if(oldUser)
 				tmpName = oldUser->name();
-			if(status == CLIENT_NICK_CHANGE && oldUser && tmpName.size() > 0) {
+			status = m_state->updateClient(cInfo);
+			if(oldUser == m_state->me() && cInfo->session() == -1 && oldUser->session() != -1)
+			{ // We have left a session
+				m_state->setStatus(CanibusState::Lobby);
+				m_state->setActiveSession(0);
+				m_screen->clearChat();
+				m_screen->updateLobby();
+				m_screen->updateChat();
+			}
+			updates++;
+		    if(updates == 1) {
+			if(status == CLIENT_NICK_CHANGE && oldUser && tmpName.size() > 0 && cInfo->name().size() > 0) {
 				msg = systemMsg(tmpName +" is now known as " + cInfo->name());
 			} else if (status == CLIENT_ADDED && m_finishedInit) {
-				if(session && atoi(session) == m_state->activeSession()->id())
+				if(m_state->status() == CanibusState::Lobby) {
 					msg = systemMsg(cInfo->name() + " has joined.");
+				}
 			}
+			if(m_state->activeSession() && oldUser && oldUser != m_state->me())
+			{
+				if(cInfo->session() == m_state->activeSession()->id())
+					msg = systemMsg(tmpName + " has joined.");
+				else if(session && cInfo->session() == -1)
+					msg = systemMsg(tmpName + " has left.");
+			} 
+
 		    }
   		    validXml = true;
 		}
@@ -203,9 +222,7 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			CanibusClient *left = m_state->findClientById(atoi(clientid));
 			if(left) {
 				m_state->delClient(left);
-				msg = new CanibusMsg();
-				msg->setType("chat");
-				msg->setValue(left->name() + " has disconnected");
+				msg = systemMsg(left->name() + " has disconnected");
 			}
 			validXml = true;
 		}
@@ -223,6 +240,8 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			} else {
 			m_state->setActiveSession(session);
 			m_state->setStatus(CanibusState::Config);
+			m_screen->clearChat();
+			m_screen->updateChat();
 			TiXmlElement *option = elem->FirstChildElement("option");
 	
 			for(option; option; option = option->NextSiblingElement()) {

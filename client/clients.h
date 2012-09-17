@@ -13,7 +13,7 @@ public:
 	CanibusClient(int id);
 	~CanibusClient();
 	int id() { return m_id; }
-	void setName(std::string name) { m_name = name; }
+	void setName(std::string name);
 	std::string name() { return m_name; }
 	void setHost(std::string host) { m_host = host; }
 	std::string host() { return m_host; }

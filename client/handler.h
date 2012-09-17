@@ -29,6 +29,7 @@ public:
 	Screen *screen() { return m_screen; }
 	void sendChat(std::string msg);
 	CanibusMsg *systemMsg(std::string msg);
+	void leave();
 	void disconnect();
 	void refresh();
 	int status();

@@ -171,6 +171,21 @@ void CanibusServer::initSocketTimeoutEvent(int socketFd)
 	//TODO
 }
 
+void CanibusServer::exitHackSession(Client *client)
+{
+	if(!client->hacksession())
+		return;
+	HackSession *session = client->hacksession();
+	session->delClient(client);
+	if(session->master() == client && session->clients() > 0) 
+		session->electNewMaster();
+	if(session->clients() > 0)
+		sendXMLUpdates();
+	else
+		delHackSession(session);
+	client->setProperty("session", -1, this);
+}
+
 void CanibusServer::exitClient(Client *client)
 {
 	Socket *socket = client->socket();
@@ -190,7 +205,6 @@ CanDevice *CanibusServer::findCanDeviceById(unsigned int id)
 
 void CanibusServer::delHackSession(HackSession *session)
 {
-	fprintf(stderr, "DEBUG: Remove empty hack session\n");
 	ioWrite("<canibusd><deletesession sessionid=\"" + itoa(session->id()) + "\"/></canibusd>\n");
 	while(session->clients())
 	{
@@ -214,7 +228,7 @@ void CanibusServer::delHackSession(HackSession *session)
 
 	if(session->candevice())
 		session->candevice()->delSession(session);
-	delete session;
+	//delete session;
 }
 
 void CanibusServer::joinHackSession(Client *client, unsigned int canbusId)
@@ -311,25 +325,12 @@ void CanibusServer::setClientName(Client *client, const std::string &name)
 
 void CanibusServer::delClient(Client *client)
 {
-	fprintf(stderr, "DEBUG: delClient(%d)\n", client->id());
 	ioWrite("<canibusd><deleteclient clientid=\"" + itoa(client->id()) + "\"/></canibusd>\n");
 	for(std::vector<Client *>::iterator it = m_clients.begin(); it != m_clients.end() && (*it) ; ++it)
 		if (*it == client)
 		{
 			removeFromScope(client);
-			HackSession *session = 0;
-			if(client->hacksession()) {
-				session = client->hacksession();
-				session->delClient(client);
-				if(session->master() == client && session->clients() > 0) 
-					session->electNewMaster();
-			}
-			if(session) {
-				if(session->clients() > 0)
-					sendXMLUpdates();
-				else
-					delHackSession(session);
-			}
+			exitHackSession(client);
 				
 			syslog( LOG_INFO, "del client: id=[%d], name=[%s], clients=[%ld]", client->id(), client->getStringProperty("name").c_str(), m_clients.size() - 1 );
 			printf("delClient %d/%ld\n", client->id(), m_clients.size() - 1);
@@ -377,8 +378,7 @@ void CanibusServer::ioWrite(const std::string &data, const bool &inLobby)
 {
 	Client *client = 0;
 	for(std::vector<Client *>::iterator it = m_clients.begin(); it != m_clients.end() && (client = *it) ; ++it)
-		if(inLobby && !client->hacksession())
-		//if ( !(inLobby && client->hacksession()) )
+		if ( !(inLobby && client->hacksession()) )
 			client->ioWrite(data);
 }
 
@@ -543,6 +543,13 @@ void CanibusServer::processCommands(Client *cInput, const std::string data2)
 	}
 
 	// This commands are always available in a HackSession
-	// TODO:
+	switch(data[0])
+	{
+	case 'x':
+		exitHackSession(cInput);
+		return;
+	default:
+		return;
+	}
 }
 

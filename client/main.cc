@@ -64,7 +64,10 @@ int main(int argc, char *argv[]) {
 				handler->refresh();
 			else if(cmd.compare(0, 6, "/join ") == 0)
 				handler->join(cmd.substr(6));
-			else
+			else if(handler->status() == CanibusState::Config) {
+				if(cmd.compare(0, 6, "/leave") == 0)
+					handler->leave();
+			} else
 				scr->addChat(handler->systemMsg("Invalid command"));
 		   } else {
 			handler->sendChat(cmd);

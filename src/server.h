@@ -24,6 +24,7 @@ public:
 	void delClient(Client *client);
 	void setClientName(Client *client, const std::string &name);
 	void exitClient(Client *client);
+	void exitHackSession(Client *client);
 
 	void sendHackSessionList(Client *client);
 	void joinHackSession(Client *client, unsigned int canbusId);
