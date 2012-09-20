@@ -67,6 +67,19 @@ int main(int argc, char *argv[]) {
 			else if(handler->status() == CanibusState::Config) {
 				if(cmd.compare(0, 6, "/leave") == 0)
 					handler->leave();
+				else if(cmd.compare(0, 6, "/start") == 0)
+					handler->start();
+				else
+					scr->addChat(handler->systemMsg("Invalid command"));
+			} else if(handler->status() == CanibusState::Run) {
+				if(cmd.compare(0, 6, "/leave") == 0)
+					handler->leave();
+				else if(cmd.compare(0, 6, "/start") == 0)
+					handler->startMonitor();
+				else if(cmd.compare(0, 5, "/stop") == 0)
+					handler->stopMonitor();
+				else
+					scr->addChat(handler->systemMsg("Invalid command"));
 			} else
 				scr->addChat(handler->systemMsg("Invalid command"));
 		   } else {

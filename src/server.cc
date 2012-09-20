@@ -161,9 +161,25 @@ void CanibusServer::delSocketTimeoutEvent(int socketFd)
   // TODO
 }
 
+void CanibusServer::processMonitors()
+{
+	HackSession *session;
+	std::vector<CanPacket *>pkts;
+	for(std::vector<HackSession *>::iterator it = m_hacksessions.begin(); it != m_hacksessions.end() && (session = *it) ; ++it)
+	{
+		if(session->candevice()->isMonitoring())
+		{
+			pkts = session->candevice()->poll();
+			if(pkts.size() > 0) {
+				session->sendPackets(pkts);
+			}
+		}
+	}
+}
+
 int CanibusServer::processEvents()
 {
-  // TODO
+	processMonitors();
 }
 
 void CanibusServer::initSocketTimeoutEvent(int socketFd)
@@ -545,6 +561,20 @@ void CanibusServer::processCommands(Client *cInput, const std::string data2)
 	// This commands are always available in a HackSession
 	switch(data[0])
 	{
+	case 's':
+		switch(data[1])
+		{
+		case 's': // Start Hack Session
+			hax->start(cInput);
+			break;
+		case 'm': // enable monitoring
+			hax->addMonitor(cInput);
+			break;
+		case 'M': // disable monitoring
+			hax->delMonitor(cInput);
+			break;
+		}
+		break;
 	case 'x':
 		exitHackSession(cInput);
 		return;

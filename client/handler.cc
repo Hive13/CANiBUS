@@ -7,6 +7,7 @@
 #include "logger.h"
 #include "clients.h"
 #include "canbusdevice.h"
+#include "canpacket.h"
 #include "session.h"
 #include "options.h"
 
@@ -42,6 +43,21 @@ void CanibusHandler::disconnect()
 void CanibusHandler::leave()
 {
 	m_socket->ioWrite(".x");
+}
+
+void CanibusHandler::start()
+{
+	m_socket->ioWrite(".ss");
+}
+
+void CanibusHandler::startMonitor()
+{
+	m_socket->ioWrite(".sm");
+}
+
+void CanibusHandler::stopMonitor()
+{
+	m_socket->ioWrite(".sM");
 }
 
 // Parses network packet into XML and ensures from CANiBUSd
@@ -151,7 +167,16 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			if(clients)
 				session->setClientCount(atoi(clients));
 			m_state->updateSession(session);
-			m_screen->updateConfig();
+			if(status && std::string(status).compare("init") == 0) {
+				m_screen->centerWrite("Initializing...");
+			}
+			if(status && std::string(status).compare("run") == 0) {
+				m_state->setStatus(CanibusState::Run);
+				m_screen->updateSession();
+				m_screen->updateChat();
+			} else {
+				m_screen->updateConfig();
+			}
 			validXml = true;
 		}
 		if(std::string(elem->Value()).compare("deletesession") == 0) {
@@ -176,6 +201,7 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 		   	int status, updates = 0;
 		   	CanibusClient *oldUser = 0;
 		   	CanibusClient *cInfo = 0;
+			CanibusSession *newsession = 0;
 			const char *clientid = elem->Attribute("clientid");
 			const char *name = elem->Attribute("name");
 			const char *host = elem->Attribute("host");
@@ -185,8 +211,10 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 				cInfo->setName(name);
 			if(host)
 				cInfo->setHost(host);
-			if(session)
+			if(session) {
+				newsession = m_state->findSessionById(atoi(session));
 				cInfo->setSession(atoi(session));
+			}
 			oldUser = m_state->findClientById(cInfo->id());
 			if(oldUser)
 				tmpName = oldUser->name();
@@ -199,6 +227,8 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 				m_screen->updateLobby();
 				m_screen->updateChat();
 			}
+			if(oldUser == m_state->me() && newsession)
+				m_state->setActiveSession(newsession);
 			updates++;
 		    if(updates == 1) {
 			if(status == CLIENT_NICK_CHANGE && oldUser && tmpName.size() > 0 && cInfo->name().size() > 0) {
@@ -218,6 +248,64 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 
 		    }
   		    validXml = true;
+		}
+		if(std::string(elem->Value()).compare("packet") == 0) {
+			const char *seqNo = elem->Attribute("seq");
+			const char *recvTime = elem->Attribute("receivetime");
+			const char *relTime = elem->Attribute("relativetime");
+			const char *error = elem->Attribute("error");
+			const char *transmitted = elem->Attribute("transmitted");
+			const char *networkname = elem->Attribute("networkname");
+			const char *arbId = elem->Attribute("arbid");
+			const char *extended = elem->Attribute("extended");
+			const char *pktSize = elem->Attribute("size");
+			const char *changed = elem->Attribute("changed");
+			const char *b1 = elem->Attribute("b1");
+			const char *b2 = elem->Attribute("b2");
+			const char *b3 = elem->Attribute("b3");
+			const char *b4 = elem->Attribute("b4");
+			const char *b5 = elem->Attribute("b5");
+			const char *b6 = elem->Attribute("b6");
+			const char *b7 = elem->Attribute("b7");
+			const char *b8 = elem->Attribute("b8");
+			CanPacket *pkt = new CanPacket(atoi(seqNo));
+			if(recvTime)
+				pkt->setRecvTime(atof(recvTime));
+			if(relTime)
+				pkt->setRelTime(atof(relTime));
+			if(error && atoi(error) > 0)
+				pkt->setError();
+			if(transmitted && atoi(transmitted) > 0)
+				pkt->setTransmitted();
+			if(networkname)
+				pkt->setNetworkName(networkname);
+			if(arbId)
+				pkt->setArbId(atoi(arbId));
+			if(extended && atoi(extended) > 0)
+				pkt->setExtended();
+			if(pktSize)
+				pkt->setSize(atoi(pktSize));
+			if(changed)
+				pkt->setChanged(atoi(changed));
+			if(b1)
+				pkt->setB1(atoi(b1));
+			if(b2)
+				pkt->setB2(atoi(b2));
+			if(b3)
+				pkt->setB3(atoi(b3));
+			if(b4)
+				pkt->setB4(atoi(b4));
+			if(b5)
+				pkt->setB5(atoi(b5));
+			if(b6)
+				pkt->setB6(atoi(b6));
+			if(b7)
+				pkt->setB7(atoi(b7));
+			if(b8)
+				pkt->setB8(atoi(b8));
+			m_state->activeSession()->addPacket(pkt);
+			m_screen->updateSession();
+			validXml = true;
 		}
 		if(std::string(elem->Value()).compare("deleteclient") == 0) {
 			const char *clientid = elem->Attribute("clientid");

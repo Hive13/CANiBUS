@@ -11,6 +11,7 @@
 #include "clients.h"
 #include "logger.h"
 #include "canbusdevice.h"
+#include "canpacket.h"
 #include "session.h"
 #include "options.h"
 
@@ -36,8 +37,8 @@ Screen::Screen()
 	m_chatWin = 0;
 	m_lobbyWin = 0;
 	m_configWin = 0;
+	m_sessionWin = 0;
 	resize();
-
 }
 
 Screen::~Screen()
@@ -72,11 +73,16 @@ void Screen::resize()
 		wresize(m_configWin, row-10, col );
 	else
 		m_configWin = newwin( row-10, col, 0, 0 );
+	if(m_sessionWin)
+		wresize(m_sessionWin, row-10, col );
+	else
+		m_sessionWin = newwin( row-10, col, 0, 0 );
 
 	promptUpdated = true;
 	chatUpdated = true;
 	lobbyUpdated = true;
 	configUpdated = true;
+	sessionUpdated = true;
 }
 
 void Screen::refreshScr()
@@ -104,6 +110,15 @@ void Screen::refreshScr()
 			promptUpdated = true;
 		}
 		break;
+	case CanibusState::Run:
+		if(sessionUpdated) {
+			wclear(m_sessionWin);
+			updateSessionWindow();
+			wrefresh(m_sessionWin);
+			sessionUpdated = false;
+			promptUpdated = true;
+		}
+		break;
 	}
 	/* Always on screen */
 	if(chatUpdated) {
@@ -120,6 +135,76 @@ void Screen::refreshScr()
 		mvwprintw(m_promptWin,0, 10, m_command.c_str());
 		wrefresh(m_promptWin);
 		promptUpdated = false;
+	}
+}
+
+void Screen::updateSessionWindow()
+{
+	int row, col, maxRow, maxCol;
+	char numbuf[25];
+	getmaxyx(m_sessionWin, maxRow, maxCol);
+	mvprintw(0, 0, "ArbID  Name        B1 B2 B3 B4 B5 B6 B7 B8");
+	mvchgat(0, 0, -1, A_REVERSE, 0, NULL);
+	if(!m_state->activeSession())
+		return;
+	map<int, CanPacket*>::iterator it;
+	map<int, CanPacket *>packets = m_state->activeSession()->packets();
+	row = 1;
+	for(it = packets.begin() ; it != packets.end() && row < maxRow ; ++it)
+	{
+		col = 1;
+		snprintf(numbuf, 24, "%d", it->second->arbId());
+		mvwprintw(m_sessionWin, row, col, numbuf);
+		col += 4;
+		mvwprintw(m_sessionWin, row, col, it->second->networkName().c_str());
+		col += 11;
+		int changed = it->second->changed();
+		switch(it->second->size())
+		{
+		case 8:
+			if(changed & B8_CHANGE) wattron(m_sessionWin, A_REVERSE);
+			snprintf(numbuf, 24, "%02X", it->second->b8());
+			mvwprintw(m_sessionWin, row, col+24, numbuf);
+			if(changed & B8_CHANGE) wattroff(m_sessionWin, A_REVERSE);
+		case 7:
+			if(changed & B7_CHANGE) wattron(m_sessionWin, A_REVERSE);
+			snprintf(numbuf, 24, "%02X", it->second->b7());
+			mvwprintw(m_sessionWin, row, col+21, numbuf);
+			if(changed & B7_CHANGE) wattroff(m_sessionWin, A_REVERSE);
+		case 6:
+			if(changed & B6_CHANGE) wattron(m_sessionWin, A_REVERSE);
+			snprintf(numbuf, 24, "%02X", it->second->b6());
+			mvwprintw(m_sessionWin, row, col+18, numbuf);
+			if(changed & B6_CHANGE) wattroff(m_sessionWin, A_REVERSE);
+		case 5:
+			if(changed & B5_CHANGE) wattron(m_sessionWin, A_REVERSE);
+			snprintf(numbuf, 24, "%02X", it->second->b5());
+			mvwprintw(m_sessionWin, row, col+15, numbuf);
+			if(changed & B5_CHANGE) wattroff(m_sessionWin, A_REVERSE);
+		case 4:
+			if(changed & B4_CHANGE) wattron(m_sessionWin, A_REVERSE);
+			snprintf(numbuf, 24, "%02X", it->second->b4());
+			mvwprintw(m_sessionWin, row, col+12, numbuf);
+			if(changed & B4_CHANGE) wattroff(m_sessionWin, A_REVERSE);
+		case 3:
+			if(changed & B3_CHANGE) wattron(m_sessionWin, A_REVERSE);
+			snprintf(numbuf, 24, "%02X", it->second->b3());
+			mvwprintw(m_sessionWin, row, col+9, numbuf);
+			if(changed & B3_CHANGE) wattroff(m_sessionWin, A_REVERSE);
+		case 2:
+			if(changed & B2_CHANGE) wattron(m_sessionWin, A_REVERSE);
+			snprintf(numbuf, 24, "%02X", it->second->b2());
+			mvwprintw(m_sessionWin, row, col+6, numbuf);
+			if(changed & B2_CHANGE) wattroff(m_sessionWin, A_REVERSE);
+		case 1:
+			if(changed & B1_CHANGE) wattron(m_sessionWin, A_REVERSE);
+			snprintf(numbuf, 24, "%02X", it->second->b1());
+			mvwprintw(m_sessionWin, row, col+3, numbuf);
+			if(changed & B1_CHANGE) wattroff(m_sessionWin, A_REVERSE);
+		case 0:
+			break;
+		}
+		row++;
 	}
 }
 

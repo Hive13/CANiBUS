@@ -1,3 +1,4 @@
+#include "canpacket.h"
 #include "session.h"
 
 CanibusSession::CanibusSession(int id)
@@ -19,4 +20,9 @@ void CanibusSession::setMasterId(int master_id)
 {
 	// Eventually lookup and validate we know the id
 	m_masterId = master_id;
+}
+
+void CanibusSession::addPacket(CanPacket *pkt)
+{
+	m_packets[pkt->arbId()] = pkt;
 }

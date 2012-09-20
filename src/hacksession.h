@@ -8,6 +8,7 @@
 
 class Client;
 class CanDevice;
+class CanPacket;
 
 class HackSession : public SessionObject
 {
@@ -30,6 +31,7 @@ public:
 	bool sendChildXMLUpdate(Client *cOutput, bool emptyUpdate);
 	void sendFullUpdate(Client *client, bool userRequest = false);
 	const std::string statusLabel();
+	void sendPackets(std::vector<CanPacket *>pkts);
 	void sendStatus(Client *client);
 	void sendConfiguration(Client *client);
 	void sendClientList(Client *client);
@@ -37,15 +39,20 @@ public:
 	Client *addClient(Client *client, bool isMaster = false);
 	void delClient(Client *client);
 	void electNewMaster();
+	void start(Client *client);
+	void addMonitor(Client *client);
+	void delMonitor(Client *client);
 
 	void setCanDevice(CanDevice *can) { m_candevice = can; }
 	CanDevice *candevice() { return m_candevice; }
 	Client *master() { return m_master; }
+	std::vector<Client *>monitors() { return m_monitoring; }
 private:
 	Status m_status;
 	Client *m_master;
 	CanDevice *m_candevice;
 	std::vector<Client *> m_clients;
+	std::vector<Client *> m_monitoring;
 	std::vector<SessionObject *> m_configOptions;
 };
 

@@ -45,6 +45,7 @@ public:
 	void initSocketTimeoutEvent(int socketFd);
 
 	int processEvents();
+	void processMonitors();
 	void processInput(Socket *Socket, const std::string data);
 	void processCommands(Client *cInput, const std::string data);
 

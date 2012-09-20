@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "elmcandevice.h"
 
-ELMCanDevice::ELMCanDevice(int id) : CanDevice(id)
+ELMCanDevice::ELMCanDevice(int id) : CanDevice(id, CanDevice::ELM)
 {
 	setProperty("name", "ELM32x", this);
 	setProperty("description", "ELM Based OBD Device", this);

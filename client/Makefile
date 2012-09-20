@@ -50,7 +50,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_canibus_OBJECTS = main.$(OBJEXT) socket.$(OBJEXT) handler.$(OBJEXT) \
 	screen.$(OBJEXT) canibusmsg.$(OBJEXT) state.$(OBJEXT) \
 	logger.$(OBJEXT) clients.$(OBJEXT) canbusdevice.$(OBJEXT) \
-	session.$(OBJEXT) options.$(OBJEXT)
+	session.$(OBJEXT) options.$(OBJEXT) canpacket.$(OBJEXT)
 canibus_OBJECTS = $(am_canibus_OBJECTS)
 canibus_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
@@ -157,12 +157,14 @@ top_srcdir = ..
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 canibus_SOURCES = main.cc socket.cc handler.cc screen.cc canibusmsg.cc \
-  state.cc logger.cc clients.cc canbusdevice.cc session.cc options.cc
+  state.cc logger.cc clients.cc canbusdevice.cc session.cc options.cc \
+  canpacket.cc
 
 noinst_HEADERS = main.h socket.h handler.h screen.h canibusmsg.h \
-  state.h logger.h clients.h canbusdevice.h session.h options.h
+  state.h logger.h clients.h canbusdevice.h session.h options.h \
+  canpacket.h
 
-canibus_LDADD = -ltinyxml -lncurses
+canibus_LDADD = -ltinyxml -lncurses -lmenu
 all: all-am
 
 .SUFFIXES:
@@ -246,6 +248,7 @@ distclean-compile:
 
 include ./$(DEPDIR)/canbusdevice.Po
 include ./$(DEPDIR)/canibusmsg.Po
+include ./$(DEPDIR)/canpacket.Po
 include ./$(DEPDIR)/clients.Po
 include ./$(DEPDIR)/handler.Po
 include ./$(DEPDIR)/logger.Po

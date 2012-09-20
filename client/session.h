@@ -3,9 +3,11 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 class CanbusDevice;
 class CanibusOption;
+class CanPacket;
 
 class CanibusSession
 {
@@ -29,6 +31,8 @@ public:
 	int maxClients() { return m_maxClients; }
 	void addOption(CanibusOption *option) { m_options.push_back(option); }
 	std::vector<CanibusOption *>options() { return m_options; }
+	void addPacket(CanPacket *pkt);
+	std::map<int, CanPacket *>packets() { return m_packets; }
 private:
 	int m_id;
 	std::string m_status;
@@ -36,6 +40,7 @@ private:
 	bool m_isPrivate;
 	CanbusDevice *m_canbusDevice;
 	std::vector<CanibusOption *> m_options;
+	std::map<int, CanPacket *> m_packets;
 	std::string m_desc;
 	int m_masterId;
 	int m_maxClients;

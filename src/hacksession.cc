@@ -5,6 +5,7 @@
 #include "client.h"
 #include "candevice.h"
 #include "hacksession.h"
+#include "canpacket.h"
 
 HackSession::HackSession(int id) : SessionObject(id, SHack)
 {
@@ -101,6 +102,42 @@ const std::string HackSession::statusLabel()
 	}
 }
 
+void HackSession::sendPackets(std::vector<CanPacket *>pkts)
+{
+	CanPacket *pkt = 0;
+	for(std::vector<CanPacket *>::iterator it = pkts.begin(); it != pkts.end() && (pkt = *it) ; ++it)
+	{
+		Client *client = 0;
+		for(std::vector<Client *>::iterator cit = m_monitoring.begin(); cit!= m_monitoring.end() && (client = *cit) ; ++cit)
+		{
+			client->ioWrite("<canibusd><packet seq=\"%d\" receivetime=\"%f\" relativetime=\"%f\" error=\"%d\" transmitted=\"%d\" networkname=\"%s\" arbid=\"%d\" extended=\"%d\" size=\"%d\" changed=\"%d\"",
+				 pkt->seqNo(), pkt->recvTime(), pkt->relTime(), pkt->hasError(), pkt->isTransmitted(), pkt->networkName().c_str(), pkt->arbId(), pkt->isExtended(), pkt->size(), pkt->changed() );
+			switch(pkt->size())
+			{
+			case 8:
+				client->ioWrite(" b8=\"%02X\"", pkt->b8());
+			case 7:
+				client->ioWrite(" b7=\"%02X\"", pkt->b7());
+			case 6:
+				client->ioWrite(" b6=\"%02X\"", pkt->b6());
+			case 5:
+				client->ioWrite(" b5=\"%02X\"", pkt->b5());
+			case 4:
+				client->ioWrite(" b4=\"%02X\"", pkt->b4());
+			case 3:
+				client->ioWrite(" b3=\"%02X\"", pkt->b3());
+			case 2:
+				client->ioWrite(" b2=\"%02X\"", pkt->b2());
+			case 1:
+				client->ioWrite(" b1=\"%02X\"", pkt->b1());
+			case 0:
+				break;
+			}
+			client->ioWrite(" /></canibusd>\n");
+		}
+	}
+}
+
 void HackSession::sendStatus(Client *client)
 {
 	client->ioWrite("<canibusd><hacksessionupdate sessionid=\"%d\" status=\"%s\"/></canibusd>\n", m_id, statusLabel().c_str());
@@ -177,10 +214,33 @@ void HackSession::unsetChildProperties()
 		(*it)->unsetPropertiesChanged();
 }
 
+void HackSession::addMonitor(Client *client)
+{
+	// Ensure we are not already monitoring
+	for(std::vector<Client *>::iterator it = m_monitoring.begin() ; it != m_monitoring.end() && (*it) ; ++it)
+		if(*it == client)
+		{
+			client->ioError("You are already monitoring this device.");
+			return;
+		}
+	m_monitoring.push_back(client);
+	m_candevice->enableMonitor();
+}
+
+void HackSession::delMonitor(Client *client)
+{
+	for(std::vector<Client *>::iterator it = m_monitoring.begin() ; it != m_monitoring.end() && (*it) ; ++it)
+		if(*it == client)
+			m_monitoring.erase(it);
+	if(m_monitoring.empty())
+		m_candevice->disableMonitor();
+}
+
 void HackSession::delClient(Client *client)
 {
+	delMonitor(client);
+
 	Client *target = 0;
-	fprintf(stderr, "DEBUG: delClients() m_clients.size()==%ld\n", m_clients.size());
 	for(std::vector<Client *>::iterator it = m_clients.begin() ; it != m_clients.end() && (target = *it) ; ++it)
 		if(target == client) {
 			if (m_master == client) {
@@ -216,14 +276,40 @@ Client *HackSession::addClient(Client *client, bool isMaster)
 
 	if (m_status == Run)
 	{
-		m_status = Init;
+		// Was temp switching but not sure I want to do that
+		//m_status = Init;
 		sendFullUpdate(client);
-		m_status = Run;
+		//m_status = Run;
 	} else {
 		sendFullUpdate(client);
 	}
 
 	return client;
+}
+
+void HackSession::start(Client *cInput)
+{
+	if(cInput != m_master)
+	{
+		cInput->ioError("Only the master can start a session.");
+		return;
+	}
+	if (m_status != Config)
+	{
+		cInput->ioError("Session already started.");
+		return;
+	}
+	m_status = Init;
+
+	m_candevice->prepareMonitor();
+
+	// Send any Init updates
+	Client *cTmp = 0;
+	for(std::vector<Client *>::iterator it = m_clients.begin(); it != m_clients.end() && (cTmp = *it) ; ++it)
+		sendFullUpdate(cTmp);
+
+	m_status = Run;
+	ioWrite("<canibusd><hacksessionupdate sessionid=\"%d\" status=\"%s\"/></canibusd>\n", m_id, statusLabel().c_str());
 }
 
 void HackSession::electNewMaster()
