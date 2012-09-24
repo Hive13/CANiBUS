@@ -4,11 +4,13 @@
 
 #include "io.h"
 #include "hacksession.h"
+#include "canpacket.h"
 #include "client.h"
 
 Client::Client(Socket *socket, int id) : SessionObject(id, SessionObject::SClient)
 {
 	m_socket = socket;
+	m_filtering = false;
 }
 
 Client::~Client()
@@ -127,3 +129,27 @@ void Client::sendClientMsg()
 	ioWrite(std::string("<canibusd><client clientid=\""+ itoa(m_id) + "\" cookie=\"" + getStringProperty("cookie").c_str() + "\"/></canibusd>\n"));
 }
 
+void Client::filterArbId(std::string filter)
+{
+	if(filter.size() > 0)
+	{
+		m_filtering = true;
+		m_ArbIdFilter = filter;
+		ioWrite("<canibusd><filter arbid=\"" + m_ArbIdFilter + "\" /></canibusd>\n");
+	}
+}
+
+void Client::disableFilters()
+{
+	m_filtering = false;
+	m_ArbIdFilter.erase();
+	ioWrite("<canibusd><filter clear=\"1\" /></canibusd>\n");
+}
+
+bool Client::filtered(CanPacket *pkt)
+{
+	// For now just do standard int check
+	if(pkt->arbId() == atoi(m_ArbIdFilter.c_str()))
+		return false;
+	return true;
+}

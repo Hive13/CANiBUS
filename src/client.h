@@ -9,6 +9,7 @@
 
 class HackSession;
 class Socket;
+class CanPacket;
 
 class Client : public SessionObject
 {
@@ -32,8 +33,14 @@ public:
 	Socket *socket() { return m_socket; }
 	void setRequestedUpdate(const bool request) { m_requestedUpdate = request; }
 	bool requestUpdate() { return m_requestedUpdate; }
+	void filterArbId(std::string filter);
+	bool filtered(CanPacket *pkt);
+	bool isFiltering() { return m_filtering; };
+	void disableFilters();
 private:
+	bool m_filtering;
 	bool m_requestedUpdate;
+	std::string m_ArbIdFilter;
 	Socket *m_socket;
 };
 

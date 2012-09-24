@@ -7,6 +7,7 @@ CanPacket::CanPacket(unsigned int seqNum)
 	m_error = false;
 	m_transmit = false;
 	m_changed = 0;
+	m_packet_count = 0;
 	bzero(&m_byte, 8);
 }
 

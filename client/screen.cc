@@ -143,16 +143,19 @@ void Screen::updateSessionWindow()
 	int row, col, maxRow, maxCol;
 	char numbuf[25];
 	getmaxyx(m_sessionWin, maxRow, maxCol);
-	mvprintw(0, 0, "ArbID  Name        B1 B2 B3 B4 B5 B6 B7 B8");
+	mvprintw(0, 0, "        ArbID  Name        B1 B2 B3 B4 B5 B6 B7 B8");
 	mvchgat(0, 0, -1, A_REVERSE, 0, NULL);
 	if(!m_state->activeSession())
 		return;
-	map<int, CanPacket*>::iterator it;
-	map<int, CanPacket *>packets = m_state->activeSession()->packets();
+	map<std::string, CanPacket*>::iterator it;
+	map<std::string, CanPacket *>packets = m_state->activeSession()->packets();
 	row = 1;
 	for(it = packets.begin() ; it != packets.end() && row < maxRow ; ++it)
 	{
 		col = 1;
+		snprintf(numbuf, 24, "%ld", it->second->getPacketCount());
+		mvwprintw(m_sessionWin, row, col, numbuf);
+		col += 8;
 		snprintf(numbuf, 24, "%d", it->second->arbId());
 		mvwprintw(m_sessionWin, row, col, numbuf);
 		col += 4;

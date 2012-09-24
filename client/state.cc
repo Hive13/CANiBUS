@@ -14,6 +14,8 @@ CanibusState::CanibusState()
 CanibusState::~CanibusState()
 {
 	delete logger;
+	if(m_activeSession)
+		delete m_activeSession;
 }
 
 void CanibusState::setNick(std::string username)

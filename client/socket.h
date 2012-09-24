@@ -31,6 +31,7 @@ public:
 	bool isConnected() { return m_connected; }
 	void enablePolling();
 	std::string serverVersion() { return m_serverVersion; }
+	void flushQ();
 private:
 	bool m_connected;
 	int m_sockfd, m_port;

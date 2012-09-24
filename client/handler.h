@@ -33,6 +33,8 @@ public:
 	void startMonitor();
 	void stopMonitor();
 	void leave();
+	void filterArbId(std::string filter);
+	void clearFilters();
 	void disconnect();
 	void refresh();
 	int status();

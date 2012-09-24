@@ -30,10 +30,13 @@ const enum CanDevice::Model CanDevice::model()
 int CanDevice::getPacketChanges(CanPacket *pkt)
 {
 	int changes = 0;
+	char buf[20];
 	CanPacket *oldPkt = 0;
-	map<int, CanPacket*>::iterator it = m_packetGroup.find(pkt->arbId());
+	snprintf(buf, 19, "%d", pkt->arbId());
+	std::string key = pkt->networkName() + buf;
+	map<std::string, CanPacket*>::iterator it = m_packetGroup.find(key);
 	if(it == m_packetGroup.end()) { // New arbId
-		m_packetGroup[pkt->arbId()] = pkt;
+		m_packetGroup[key] = pkt;
 		changes = 255;
 	} else {
 		oldPkt = it->second;
@@ -53,7 +56,7 @@ int CanDevice::getPacketChanges(CanPacket *pkt)
 			changes |= B7_CHANGE;
 		if(oldPkt->b8() != pkt->b8())
 			changes |= B8_CHANGE;
-		m_packetGroup[pkt->arbId()] = pkt;
+		m_packetGroup[key] = pkt;
 	}
 	return changes;
 }
@@ -122,6 +125,7 @@ void CanbusSimulator::enableMonitor()
 	string seqNo, absTime, relTime, status, error, transmit;
 	string desc, network, node, arbid, remote, extended;
 	string b1,b2,b3,b4,b5,b6,b7,b8,value,trigger,signals;
+	m_packets.clear();
 	ifstream file( "sample-can-traffic.csv" );
 	while ( file.good() )
 	{

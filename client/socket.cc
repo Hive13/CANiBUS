@@ -86,9 +86,9 @@ std::string Socket::poll()
 {
 	std::string packet;
 	int n;
-	char buf[255];
+	char buf[2048];
 
-	n = read(m_sockfd, buf, 255);
+	n = read(m_sockfd, buf, 2047);
 	if(n > 0) {
 		// read up to \n
 		for(int i=0; i < n; i++) {
@@ -108,9 +108,17 @@ std::string Socket::poll()
 	return packet;
 }
 
+void Socket::flushQ()
+{
+	m_packet.clear();
+	std::queue<std::string> empty;
+	std::swap(m_packetQ, empty);
+}
+
 void Socket::ioWrite(std::string msg)
 {
 	int n;
+	if(msg.size() == 0) return;
 	msg += "\n";
 	n = write(m_sockfd, msg.c_str(), msg.length());
 }

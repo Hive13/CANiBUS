@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 				else if(cmd.compare(0, 6, "/start") == 0)
 					handler->start();
 				else
-					scr->addChat(handler->systemMsg("Invalid command"));
+					handler->systemMsg("Invalid command");
 			} else if(handler->status() == CanibusState::Run) {
 				if(cmd.compare(0, 6, "/leave") == 0)
 					handler->leave();
@@ -78,10 +78,14 @@ int main(int argc, char *argv[]) {
 					handler->startMonitor();
 				else if(cmd.compare(0, 5, "/stop") == 0)
 					handler->stopMonitor();
+				else if(cmd.compare(0, 8, "/filter ") == 0)
+					handler->filterArbId(cmd.substr(8));
+				else if(cmd.compare(0, 6, "/clear") == 0)
+					handler->clearFilters();
 				else
-					scr->addChat(handler->systemMsg("Invalid command"));
+					handler->systemMsg("Invalid command");
 			} else
-				scr->addChat(handler->systemMsg("Invalid command"));
+				handler->systemMsg("Invalid command");
 		   } else {
 			handler->sendChat(cmd);
 		   }

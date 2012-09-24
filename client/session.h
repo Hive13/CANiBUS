@@ -32,15 +32,17 @@ public:
 	void addOption(CanibusOption *option) { m_options.push_back(option); }
 	std::vector<CanibusOption *>options() { return m_options; }
 	void addPacket(CanPacket *pkt);
-	std::map<int, CanPacket *>packets() { return m_packets; }
+	void clearPackets();
+	std::map<std::string, CanPacket *>packets() { return m_packets; }
 private:
 	int m_id;
 	std::string m_status;
 	int m_numClients;
 	bool m_isPrivate;
 	CanbusDevice *m_canbusDevice;
+	CanibusLogger *logger;
 	std::vector<CanibusOption *> m_options;
-	std::map<int, CanPacket *> m_packets;
+	std::map<std::string, CanPacket *> m_packets;
 	std::string m_desc;
 	int m_masterId;
 	int m_maxClients;

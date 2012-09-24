@@ -40,7 +40,7 @@ private:
 	Model m_model;
 	std::vector<HackSession *>m_sessions;
 	std::vector<CanPacket *>m_packets;
-	std::map<int, CanPacket *> m_packetGroup;
+	std::map<std::string, CanPacket *> m_packetGroup;
 };
 
 class CanbusSimulator : public CanDevice

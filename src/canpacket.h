@@ -30,6 +30,9 @@ public:
 	bool isExtended() { return m_extended; }
 	void setChanged(int change) { m_changed = change; }
 	int changed() { return m_changed; }
+	void setPacketCount(long count) { m_packet_count = count; }
+	void incPacketCount() { m_packet_count++; }
+	long getPacketCount() { return m_packet_count; }
 	void setBytes(const char bytes[8]);
 	const char *bytes() { return m_byte; }
 	void setB1(char b) { m_byte[0] = b; }
@@ -59,6 +62,7 @@ private:
 	unsigned int m_arb_id;
 	bool m_extended;
 	int m_changed;
+	long m_packet_count;
 	char m_byte[8];
 };
 

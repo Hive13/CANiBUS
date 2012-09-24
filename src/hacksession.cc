@@ -105,11 +105,16 @@ const std::string HackSession::statusLabel()
 void HackSession::sendPackets(std::vector<CanPacket *>pkts)
 {
 	CanPacket *pkt = 0;
+	// Cycle through each packet
 	for(std::vector<CanPacket *>::iterator it = pkts.begin(); it != pkts.end() && (pkt = *it) ; ++it)
 	{
 		Client *client = 0;
+		// cycle through each monitor
 		for(std::vector<Client *>::iterator cit = m_monitoring.begin(); cit!= m_monitoring.end() && (client = *cit) ; ++cit)
 		{
+			if(client->isFiltering() && client->filtered(pkt))
+				continue;
+
 			client->ioWrite("<canibusd><packet seq=\"%d\" receivetime=\"%f\" relativetime=\"%f\" error=\"%d\" transmitted=\"%d\" networkname=\"%s\" arbid=\"%d\" extended=\"%d\" size=\"%d\" changed=\"%d\"",
 				 pkt->seqNo(), pkt->recvTime(), pkt->relTime(), pkt->hasError(), pkt->isTransmitted(), pkt->networkName().c_str(), pkt->arbId(), pkt->isExtended(), pkt->size(), pkt->changed() );
 			switch(pkt->size())
@@ -229,9 +234,11 @@ void HackSession::addMonitor(Client *client)
 
 void HackSession::delMonitor(Client *client)
 {
+	/*
 	for(std::vector<Client *>::iterator it = m_monitoring.begin() ; it != m_monitoring.end() && (*it) ; ++it)
 		if(*it == client)
 			m_monitoring.erase(it);
+	*/
 	if(m_monitoring.empty())
 		m_candevice->disableMonitor();
 }

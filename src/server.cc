@@ -573,6 +573,17 @@ void CanibusServer::processCommands(Client *cInput, const std::string data2)
 		case 'M': // disable monitoring
 			hax->delMonitor(cInput);
 			break;
+		case 'f': // Filters
+			switch(data[2])
+			{
+			case 'a':  // ArbID
+				cInput->filterArbId(data2.substr(3));
+				break;
+			case 'x':
+				cInput->disableFilters();
+				break;
+			}
+			break;
 		}
 		break;
 	case 'x':

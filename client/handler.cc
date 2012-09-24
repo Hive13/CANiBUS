@@ -60,6 +60,18 @@ void CanibusHandler::stopMonitor()
 	m_socket->ioWrite(".sM");
 }
 
+void CanibusHandler::filterArbId(std::string filter)
+{
+	m_socket->ioWrite(".sfa" + filter);
+	m_socket->flushQ();
+}
+
+void CanibusHandler::clearFilters()
+{
+	m_socket->ioWrite(".sfx");
+	m_socket->flushQ();
+}
+
 // Parses network packet into XML and ensures from CANiBUSd
 bool CanibusHandler::validatePacket(const char *packet)
 {
@@ -115,6 +127,7 @@ CanibusMsg *CanibusHandler::systemMsg(std::string data)
 	CanibusMsg *msg = new CanibusMsg;
 	msg->setType("chat");
 	msg->setValue(data);
+	m_screen->addChat(msg);
 	return msg;
 }
 
@@ -186,6 +199,18 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 				//m_state->delSession(atoi(sessionid));
 			validXml = true;
 		}
+		if(std::string(elem->Value()).compare("filter") == 0) {
+			const char *arbid=elem->Attribute("arbid");
+			const char *clear=elem->Attribute("clear");
+			if(arbid)
+				systemMsg("Applying filter ArbId=" + std::string(arbid));
+			if(clear)
+				systemMsg("Clearing filter");
+			// For now just cear the map and let the server handle it
+			if(m_state->activeSession())
+				m_state->activeSession()->clearPackets();
+			validXml = true;
+		}
 		if(std::string(elem->Value()).compare("client") == 0) {
 			const char *clientid = elem->Attribute("clientid");
 			const char *cookie = elem->Attribute("cookie");
@@ -232,18 +257,18 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			updates++;
 		    if(updates == 1) {
 			if(status == CLIENT_NICK_CHANGE && oldUser && tmpName.size() > 0 && cInfo->name().size() > 0) {
-				msg = systemMsg(tmpName +" is now known as " + cInfo->name());
+				systemMsg(tmpName +" is now known as " + cInfo->name());
 			} else if (status == CLIENT_ADDED && m_finishedInit) {
 				if(m_state->status() == CanibusState::Lobby) {
-					msg = systemMsg(cInfo->name() + " has joined.");
+					systemMsg(cInfo->name() + " has joined.");
 				}
 			}
 			if(m_state->activeSession() && oldUser && oldUser != m_state->me())
 			{
 				if(cInfo->session() == m_state->activeSession()->id())
-					msg = systemMsg(tmpName + " has joined.");
+					systemMsg(tmpName + " has joined.");
 				else if(session && cInfo->session() == -1)
-					msg = systemMsg(tmpName + " has left.");
+					systemMsg(tmpName + " has left.");
 			} 
 
 		    }
@@ -312,7 +337,7 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			CanibusClient *left = m_state->findClientById(atoi(clientid));
 			if(left) {
 				m_state->delClient(left);
-				msg = systemMsg(left->name() + " has disconnected");
+				systemMsg(left->name() + " has disconnected");
 			}
 			validXml = true;
 		}
@@ -321,12 +346,12 @@ CanibusMsg *CanibusHandler::processMsg(const char *packet)
 			if(!sessionid) {
 				logger->log("Invalid session id");
 				logger->log(m_xmlDoc);
-				msg = systemMsg("Received invalid session id");
+				systemMsg("Received invalid session id");
 			} else {
 			CanibusSession *session = m_state->findSessionById(atoi(sessionid));
 			if(!session) {
 				logger->log("Could not find session id: %s\n", sessionid);
-				msg = systemMsg("Received an unknown session id");
+				systemMsg("Received an unknown session id");
 			} else {
 			m_state->setActiveSession(session);
 			m_state->setStatus(CanibusState::Config);
