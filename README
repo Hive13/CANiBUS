@@ -2,6 +2,11 @@
 
 wiki: http://wiki.hive13.org/CANiBUS
 
+*** TRANSITION NOTE ****
+* The C++ code works but we are moving to Go
+* The Go code is not ready but the code temporarily resides in go_server
+***********************
+
 -== Summary ==-
 The CANiBUS Server connects one or more CAN devices to one or more researchers.
 The CANiBUS Server has drivers for each CAN device that abstracts the

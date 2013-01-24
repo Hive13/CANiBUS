@@ -1,0 +1,11 @@
+This is the Go code for the new Canibus Server and sample client
+
+To build set your $GOPATH to here
+
+go install all
+
+./bin/canibusd
+
+This is Canibusd version 0.0.2  The API protocol has changed
+
+See the Hive13 wiki for mroe information
