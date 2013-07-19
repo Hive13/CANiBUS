@@ -2,6 +2,7 @@
 package api
 
 import (
+	"canibus/logger"
 	"fmt"
 )
 
@@ -25,6 +26,12 @@ type Cmd struct {
 	Arg    []string
 }
 
+// Generic Error struct to send clients
+type Err struct {
+	Type string
+	Msg string
+}
+
 type Client struct {
 	ClientID int
 	Cookie   string
@@ -45,4 +52,18 @@ func InitAPI() {
 	APIVersion.Minor = 0
 	APIVersion.Sub = 2
 	ServerVersion.Version = APIVersion.ToString()
+}
+
+func ProcessLogin(cmd *Cmd) error {
+        switch len(cmd.Arg) {
+        case 1:
+                if cmd.Arg[0] == "" {
+                        return logger.Err("Login: Invalid Name")
+                }
+		// Currently no real checks
+		return nil
+        default:
+                return logger.Err("Login: Wrong number of arguments needed to login")
+        }
+	return logger.Err("Internal error for ProcessLogin")
 }

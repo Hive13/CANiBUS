@@ -14,6 +14,11 @@ const (
 	LANG_JSON
 )
 
+const (
+	STATE_UNAUTH = iota
+	STATE_LOBBY
+)
+
 // Main Client Structure
 type Client struct {
 	Name     string
@@ -22,6 +27,8 @@ type Client struct {
 	Conn     net.Conn
 	Quit     chan bool
 	Lang     int
+	State	int
+	Id	int
 }
 
 // Closes the clients connection
@@ -98,6 +105,27 @@ func (c *Client) ProcessIncoming(msg string) (*api.Cmd, error) {
 	return cmd, nil
 }
 
+func (c *Client) sendError(t string, msg string) {
+	err := &api.Err{ t, msg }
+	c.ProcessOutgoing(err)
+}
+
+// ProcessLogin assumes Arg0 = Name
+func (c *Client) ProcessLogin(cmd *api.Cmd) {
+	switch len(cmd.Arg) {
+	case 1:
+		if cmd.Arg[0] == "" {
+			c.sendError("Login","Invalid Name")
+			return
+		}
+		c.Name = cmd.Arg[0] // Do we want to make this uniq?
+		c.State = STATE_LOBBY
+		logger.Log(c.Name + " logged in")
+	default:
+		c.sendError("Login", "Wrong number of arguments needed to login")
+	}
+}
+
 // ProcessCommand processes client commands from the network socket
 func (c *Client) ProcessCommand(cmd string) {
 	//fmt.Println("DEBUG: process cmd: ", cmd)
@@ -108,7 +136,7 @@ func (c *Client) ProcessCommand(cmd string) {
 	}
 	switch aCmd.Action {
 	case "Login":
-		fmt.Println("DEBUG: Handle login")
+		c.ProcessLogin(aCmd)
 	case "":
 		logger.Log("Invalid Cmd request")
 		return
@@ -116,3 +144,5 @@ func (c *Client) ProcessCommand(cmd string) {
 		logger.Log("Unkown action:" + aCmd.Action)
 	}
 }
+
+

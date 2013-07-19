@@ -14,6 +14,7 @@ import (
 
 type ServerData struct {
 	ClientList *list.List
+	LastId int
 }
 
 // Global Data
@@ -69,6 +70,8 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 	// Valid nugde string
+	GData.LastId += 1
+	newClient.Id = GData.LastId
 	newClient.Incoming = make(chan string)
 	newClient.Outgoing = make(chan string)
 	newClient.Conn = conn
