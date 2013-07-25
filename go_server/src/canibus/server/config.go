@@ -23,23 +23,18 @@ func (c *Config) LoadConfig(conf string) {
 		logger.Log("Could not open config file")
 		return
 	}
-	buf := make([]byte, 1024)
 	var elem []ConfigElement
+	dec := json.NewDecoder(cfile)
 	for {
-		n, err := cfile.Read(buf)
+		err = dec.Decode(&elem)
 		if err != nil && err != io.EOF {
-			logger.Log("Could not read config file")
-			return
-		}
-		if n == 0 {
-			break
-		}
-		err = json.Unmarshal(buf, &elem)
-		if err != nil {
 			fmt.Println("Error:", err)
-			logger.Log("Could not unmarshal config element")
+			logger.Log("Could not decode config element")
 		} else {
-			fmt.Printf("DEBUG: %+v", elem)
+			if err == io.EOF {
+				break
+			}
+			fmt.Printf("DEBUG: %+v\n", elem)
 		}
 	}
 	cfile.Close()
