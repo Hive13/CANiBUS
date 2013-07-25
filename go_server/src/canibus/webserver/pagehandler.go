@@ -4,6 +4,7 @@
 package webserver
 
 import (
+	"html/template"
 	"io/ioutil"
 	"path"
 )
@@ -22,4 +23,11 @@ func loadPage(filename string) (*Page, error) {
 	return &Page{Body: body}, nil
 }
 
+func loadTemplate(filename string) (*template.Template, error) {
+	t, err := template.ParseFiles(path.Join(web_root, filename))
+	if err !=  nil {
+		return nil, err
+	}
+	return t, nil
+}
 

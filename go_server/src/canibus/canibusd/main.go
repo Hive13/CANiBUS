@@ -4,6 +4,7 @@ package main
 import (
 	"canibus/server"
 	"canibus/webserver"
+	"flag"
 	"os"
 )
 
@@ -14,8 +15,13 @@ const (
 	DEFAULT_WWW_ROOT = "www"
 )
 
+var bindIP = flag.String("ip", DEFAULT_IP, "Default IP to bind to")
+var tcpPort = flag.String("port", DEFAULT_PORT, "Default TCP port")
+var wwwPort = flag.String("www", DEFAULT_WEBPORT, "Default port for web server")
+var wwwRoot = flag.String("root", DEFAULT_WWW_ROOT, "Default file path for web server")
+
 func launchTCPServer() {
-	err := server.StartListener(DEFAULT_IP, DEFAULT_PORT)
+	err := server.StartListener(*bindIP, *tcpPort)
 	if err != nil {
 		println(err.Error())
 		os.Exit(1)
@@ -23,7 +29,7 @@ func launchTCPServer() {
 }
 
 func launchWebServer() {
-	err := webserver.StartWebListener(DEFAULT_WWW_ROOT, DEFAULT_IP, DEFAULT_WEBPORT)
+	err := webserver.StartWebListener(*wwwRoot, *bindIP, *wwwPort)
 	if err != nil {
 		println(err.Error())
 		os.Exit(1)
@@ -32,6 +38,7 @@ func launchWebServer() {
 }
 
 func main() {
+	flag.Parse()
 	go launchTCPServer()
 	launchWebServer()
 }

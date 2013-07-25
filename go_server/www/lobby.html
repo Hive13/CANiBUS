@@ -1,1 +1,62 @@
-Lobby
+<HTML>
+  <HEAD>
+    <TITLE>CANiBUS Lobby</TITLE>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        var conn;
+        var msg = $("#lobbyChatMsg");
+        var chatLobby = $("#chatLobby");
+
+        function appendChat(msg) {
+          var d = chatLobby[0];
+          var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
+          if (doScroll) {
+            d.scrollTop = d.scrollHeight - d.clientHeight;
+          }
+        }
+
+        $("#chatForm").submit(function() {
+          if (!conn) {
+            return false;
+          }
+          if (!msg.val()) {
+            return false;
+          }
+          conn.send(msg.val());
+          msg.val("");
+          return false;
+        });
+
+        if (window["WebSocket"]) {
+          conn = new WebSocket("ws://{{$}}/chatLobby");
+          conn.onclose = function(evt) {
+            appendChat($("<div><b>Connection closed.</b></div>"));
+          }
+          conn.onmessage = function(evt) {
+            appendChat($("<div/>").text(evt.data));
+          }
+        } else {
+           appendChat($("<div><b>Your browser does not support WebSockets.</b></div>"));
+        }
+        });
+    </script>
+  </HEAD>
+  <BODY>
+    <CENTER><H1>CANiBUS Lobby</H1></CENTER>
+    <TABLE>
+      <tr>
+        <th>Interface</th><th>Vehicle Info</th><th>Session</th><th>Action</th>
+      </tr>
+    </TABLE>
+    <HR>
+    <B>Lobby Chat</B><BR>
+    <div id="chatLobby"></div>
+    <FORM id=chatForm>
+      <INPUT type=text id=lobbyChatMsg size=64>
+      <INPUT type=submit value="Send">
+    </FORM>
+    <BR>
+    <A href="/logout">Logout</A><BR>
+  </BODY>
+</HTML>
