@@ -13,12 +13,16 @@ const (
 	DEFAULT_PORT = "1234"
         DEFAULT_WEBPORT = "2515"
 	DEFAULT_WWW_ROOT = "www"
+	DEFAULT_CONFIG_FILE = "config.json"
 )
 
-var bindIP = flag.String("ip", DEFAULT_IP, "Default IP to bind to")
-var tcpPort = flag.String("port", DEFAULT_PORT, "Default TCP port")
-var wwwPort = flag.String("www", DEFAULT_WEBPORT, "Default port for web server")
-var wwwRoot = flag.String("root", DEFAULT_WWW_ROOT, "Default file path for web server")
+var ServerConfig server.Config
+
+var bindIP = flag.String("ip", DEFAULT_IP, "IP to bind to")
+var tcpPort = flag.String("port", DEFAULT_PORT, "TCP port")
+var wwwPort = flag.String("www", DEFAULT_WEBPORT, "port for web server")
+var wwwRoot = flag.String("root", DEFAULT_WWW_ROOT, "file path for web server")
+var configFile = flag.String("config", DEFAULT_CONFIG_FILE, "Settings config file")
 
 func launchTCPServer() {
 	err := server.StartListener(*bindIP, *tcpPort)
@@ -39,6 +43,7 @@ func launchWebServer() {
 
 func main() {
 	flag.Parse()
+	ServerConfig.LoadConfig(*configFile)
 	go launchTCPServer()
 	launchWebServer()
 }
