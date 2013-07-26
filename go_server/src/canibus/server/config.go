@@ -1,6 +1,7 @@
 package server
 
 import (
+	"canibus/candevice"
 	"canibus/logger"
 	"encoding/json"
 	"os"
@@ -15,6 +16,7 @@ type ConfigElement struct {
 }
 
 type Config struct {
+	Drivers []candevice.CanDevice
 }
 
 func (c *Config) LoadConfig(conf string) {
@@ -34,7 +36,15 @@ func (c *Config) LoadConfig(conf string) {
 			if err == io.EOF {
 				break
 			}
-			fmt.Printf("DEBUG: %+v\n", elem)
+			for i := range elem {
+				if elem[i].DeviceType == "simulator" {
+					dev := &candevice.Simulator{}
+					dev.SetPacketFile(elem[i].DeviceFile)
+					c.Drivers = append(c.Drivers, dev)
+				} else {
+					fmt.Printf("Unknown config setting: %+v\n", elem[i])
+				}
+			}
 		}
 	}
 	cfile.Close()

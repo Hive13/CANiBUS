@@ -44,6 +44,7 @@ func launchWebServer() {
 func main() {
 	flag.Parse()
 	ServerConfig.LoadConfig(*configFile)
+	server.InitDrivers(ServerConfig)
 	go launchTCPServer()
 	launchWebServer()
 }

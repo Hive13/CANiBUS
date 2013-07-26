@@ -12,11 +12,12 @@ type Simulator struct {
 	Packets []CanData
 }
 
-func (sim *Simulator) setPacketFile(packets string) {
+func (sim *Simulator) SetPacketFile(packets string) {
 	sim.PacketFile = packets
 }
 
 func (sim *Simulator) Init() bool {
+	logger.Log("Loading packets from " + sim.PacketFile)
 	packets, err := os.Open(sim.PacketFile)
 	if err != nil {
 		logger.Log("Could not open Simulator data file")
