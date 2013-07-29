@@ -20,6 +20,10 @@ type Config struct {
 }
 
 func (c *Config) LoadConfig(conf string) {
+	if len(conf) == 0 {
+		logger.Log("No config file given")
+		return
+	}
 	cfile, err := os.Open(conf)
 	if err != nil {
 		logger.Log("Could not open config file")
@@ -48,4 +52,8 @@ func (c *Config) LoadConfig(conf string) {
 		}
 	}
 	cfile.Close()
+}
+
+func (c *Config) GetDrivers() []candevice.CanDevice {
+	return c.Drivers
 }

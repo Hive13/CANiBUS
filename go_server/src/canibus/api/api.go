@@ -2,9 +2,15 @@
 package api
 
 import (
+	"canibus/candevice"
 	"canibus/logger"
 	"fmt"
 )
+
+type Configer interface {
+	GetDrivers() []candevice.CanDevice
+	LoadConfig(conf string)
+}
 
 type CanibusAPIVersion struct {
 	Major int

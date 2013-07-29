@@ -1,10 +1,13 @@
 package server
 
 import (
+	"canibus/core"
 )
 
-func InitDrivers(conf Config) {
-	for i := range conf.Drivers {
-		conf.Drivers[i].Init()
+func InitDrivers() {
+	var conf = core.GetConfig()
+	var drivers = conf.GetDrivers()
+	for i := range drivers {
+		drivers[i].Init()
 	}
 }

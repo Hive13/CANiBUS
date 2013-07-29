@@ -18,6 +18,14 @@ func (mcp *GoodThopter) SetSerial(port string) {
 	mcp.SerialPort = port
 }
 
+func (mcp *GoodThopter) DeviceDesc() string {
+	return "TODO: VIN"
+}
+
+func (mcp *GoodThopter) DeviceType() string {
+	return "GoodThopter"
+}
+
 func (mcp *GoodThopter) Init() bool {
 	c := &serial.Config{Name: "/dev/ttyUSB0", Baud: 115200}
 	c.Name = mcp.SerialPort

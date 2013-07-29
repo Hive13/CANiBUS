@@ -44,3 +44,12 @@ func (sim *Simulator) Init() bool {
 	packets.Close()
 	return true
 }
+
+func (sim *Simulator) DeviceDesc() string {
+	return sim.PacketFile
+}
+
+func (sim *Simulator) DeviceType() string {
+	return "Simulator"
+}
+

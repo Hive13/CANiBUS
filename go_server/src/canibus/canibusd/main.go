@@ -2,6 +2,7 @@
 package main
 
 import (
+	"canibus/core"
 	"canibus/server"
 	"canibus/webserver"
 	"flag"
@@ -43,8 +44,9 @@ func launchWebServer() {
 
 func main() {
 	flag.Parse()
-	ServerConfig.LoadConfig(*configFile)
-	server.InitDrivers(ServerConfig)
+	core.SetConfig(&ServerConfig)
+	core.LoadConfig(*configFile)
+	server.InitDrivers()
 	go launchTCPServer()
 	launchWebServer()
 }

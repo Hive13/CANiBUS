@@ -4,6 +4,7 @@
 package webserver
 
 import (
+	"canibus/core"
 	"canibus/logger"
 	"canibus/api"
 	"fmt"
@@ -12,6 +13,11 @@ import (
 	"github.com/gorilla/sessions"
 	//"code.google.com/p/go.net/websocket"
 )
+
+type LobbyTemplate struct {
+	Host string
+	Config api.Configer
+}
 
 type connection struct {
 	// The websocket connection.
@@ -94,7 +100,13 @@ func lobbyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	t.Execute(w, r.Host)
+	data := LobbyTemplate{}
+	data.Host = r.Host
+	data.Config = core.GetConfig()
+	exec_err := t.Execute(w, data)
+	if exec_err != nil {
+		fmt.Println("Lobby Error: ", exec_err)
+	}
 }
 
 func configHandler(w http.ResponseWriter, r *http.Request) {
