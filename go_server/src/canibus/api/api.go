@@ -12,6 +12,11 @@ type Configer interface {
 	LoadConfig(conf string)
 }
 
+type User interface {
+	GetName() string
+	SetName(name string)
+}
+
 type CanibusAPIVersion struct {
 	Major int
 	Minor int

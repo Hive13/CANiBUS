@@ -7,6 +7,7 @@ import (
 	"canibus/core"
 	"canibus/logger"
 	"canibus/api"
+	"canibus/canibususer"
 	"fmt"
 	"net/http"
 	"github.com/gorilla/securecookie"
@@ -17,6 +18,7 @@ import (
 type LobbyTemplate struct {
 	Host string
 	Config api.Configer
+	NumOfUsers int
 }
 
 type connection struct {
@@ -89,6 +91,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "canibus")
 	session.Values["user"] = user
 	session.Save(r, w)
+	var NewUser canibususer.CanibusUser
+	NewUser.SetName(user)
+	core.AddUser(&NewUser)
 	http.Redirect(w, r, "/lobby", http.StatusFound)
 }
 
@@ -103,6 +108,7 @@ func lobbyHandler(w http.ResponseWriter, r *http.Request) {
 	data := LobbyTemplate{}
 	data.Host = r.Host
 	data.Config = core.GetConfig()
+	data.NumOfUsers = core.NumberOfUsers()
 	exec_err := t.Execute(w, data)
 	if exec_err != nil {
 		fmt.Println("Lobby Error: ", exec_err)
