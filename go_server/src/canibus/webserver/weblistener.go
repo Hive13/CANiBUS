@@ -8,7 +8,9 @@ import (
 	"canibus/logger"
 	"canibus/api"
 	"canibus/canibususer"
+	"canibus/candevice"
 	"fmt"
+	"strconv"
 	"net/http"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
@@ -19,6 +21,10 @@ type LobbyTemplate struct {
 	Host string
 	Config api.Configer
 	NumOfUsers int
+}
+
+type ConfigTemplate struct {
+	Device *candevice.CanDevice
 }
 
 type connection struct {
@@ -116,7 +122,30 @@ func lobbyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func configHandler(w http.ResponseWriter, r *http.Request) {
-
+	auth_err := checkAuth(w, r)
+	if auth_err != nil { return }
+	t, err := loadTemplate("config.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	str_id := r.FormValue("id")
+	id, id_err := strconv.Atoi(str_id)
+	if id_err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	dev, dev_err := core.GetDeviceById(id)
+	if dev_err != nil {
+		http.Error(w, dev_err.Error(), http.StatusNotFound)
+		return
+	}
+	data := ConfigTemplate{}
+	data.Device = dev
+        exec_err := t.Execute(w, data)
+        if exec_err != nil {
+                fmt.Println("Config Error: ", exec_err)
+        }
 }
 
 func hacksessionHandler(w http.ResponseWriter, r *http.Request) {

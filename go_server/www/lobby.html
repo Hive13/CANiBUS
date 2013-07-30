@@ -51,8 +51,19 @@
            <tr>
               <td>{{.DeviceType}}</td>
               <td>{{.DeviceDesc}}</td>
-              <td>TODO</td>
-              <td>TODO</td>
+              <td>{{if `.GetHackSession == nil`}}
+		    Idle
+		   {{else}}
+		    {{.GetHackSession}}
+		   {{end}}
+	          </td>
+              <td>
+		{{if `.GetHackSession == nil`}}
+		  <a href="/config?id={{.GetId}}">Config</a>
+	        {{else}}
+		  <a href="/join?id={{.GetId}}">Join</a>
+		{{end}}
+              </td>
            </tr>
         {{end}}
       </tr>

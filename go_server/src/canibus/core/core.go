@@ -4,6 +4,7 @@ package core
 import (
 	"canibus/api"
 	"canibus/logger"
+	"canibus/candevice"
 )
 
 type CoreData struct {
@@ -31,6 +32,16 @@ func NumberOfUsers() int {
 		return 0
 	}
 	return len(CData.Users)
+}
+
+func GetDeviceById(id int) (*candevice.CanDevice, error) {
+	drivers := CData.CConfig.GetDrivers()
+	for i := range drivers {
+		if drivers[i].GetId() == id {
+			return &drivers[i], nil
+		}
+	}
+	return nil, logger.Err("No device with that ID")
 }
 
 func GetUserByName(userName string) (*api.User, error) {
