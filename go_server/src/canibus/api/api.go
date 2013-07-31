@@ -2,19 +2,40 @@
 package api
 
 import (
-	"canibus/candevice"
 	"canibus/logger"
 	"fmt"
 )
 
 type Configer interface {
-	GetDrivers() []candevice.CanDevice
+	GetDrivers() []CanDevice
 	LoadConfig(conf string)
 }
 
 type User interface {
 	GetName() string
 	SetName(name string)
+	GetDeviceId() int
+	SetDeviceId(int)
+}
+
+type CanDevice interface {
+        Init() bool
+        DeviceType() string
+        DeviceDesc() string
+        GetId() int
+        SetId(int)
+        GetHackSession() HackSession
+        SetHackSession(HackSession)
+}
+
+type HackSession interface {
+	GetState() string
+	SetState(int)
+	GetDeviceId() int
+	SetDeviceId(int)
+	NumOfUsers() int
+	AddUser(User)
+	RemoveUser(User)
 }
 
 type CanibusAPIVersion struct {

@@ -1,7 +1,7 @@
 package hacksession
 
 import (
-	"canibus/canibususer"
+	"canibus/api"
 	"fmt"
 )
 
@@ -12,8 +12,9 @@ const (
 )
 
 type HackSession struct {
-	Users []canibususer.CanibusUser
+	Users []api.User
 	State int
+	DeviceId int
 }
 
 func (s *HackSession)GetState() string {
@@ -27,5 +28,31 @@ func (s *HackSession)GetState() string {
 
 func (s *HackSession)SetState(state int) {
 	s.State = state
+}
+
+func (s *HackSession)GetDeviceId() int {
+	return s.DeviceId
+}
+
+func (s *HackSession)SetDeviceId(id int) {
+	s.DeviceId = id
+}
+
+func (s *HackSession)NumOfUsers() int {
+	return len(s.Users)
+}
+
+func (s *HackSession)AddUser(user api.User) {
+	s.Users = append(s.Users, user)
+}
+
+func (s *HackSession)RemoveUser(user api.User) {
+	var newUsers []api.User
+	for i := range s.Users {
+		if s.Users[i].GetName() != user.GetName() {
+			newUsers = append(newUsers, s.Users[i])
+		}
+	}
+	s.Users = newUsers
 }
 

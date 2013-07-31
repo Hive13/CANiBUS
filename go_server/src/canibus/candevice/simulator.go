@@ -1,7 +1,7 @@
 package candevice
 
 import (
-	"canibus/hacksession"
+	"canibus/api"
 	"canibus/logger"
 	"encoding/json"
 	"os"
@@ -11,7 +11,7 @@ import (
 type Simulator struct {
 	PacketFile string
 	Packets []CanData
-	HackSession *hacksession.HackSession
+	HackSession api.HackSession
 	id int
 }
 
@@ -56,12 +56,12 @@ func (sim *Simulator) DeviceType() string {
 	return "Simulator"
 }
 
-func (sim *Simulator) GetHackSession() *hacksession.HackSession {
+func (sim *Simulator) GetHackSession() api.HackSession {
 	return sim.HackSession
 }
 
-func (sim *Simulator) SetHackSession(hsession hacksession.HackSession) {
-	sim.HackSession = &hsession
+func (sim *Simulator) SetHackSession(hsession api.HackSession) {
+	sim.HackSession = hsession
 }
 
 func (sim *Simulator) GetId() int {

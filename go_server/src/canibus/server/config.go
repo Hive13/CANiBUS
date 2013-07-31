@@ -1,6 +1,7 @@
 package server
 
 import (
+	"canibus/api"
 	"canibus/candevice"
 	"canibus/logger"
 	"encoding/json"
@@ -16,7 +17,7 @@ type ConfigElement struct {
 }
 
 type Config struct {
-	Drivers []candevice.CanDevice
+	Drivers []api.CanDevice
 }
 
 func (c *Config) LoadConfig(conf string) {
@@ -54,7 +55,7 @@ func (c *Config) LoadConfig(conf string) {
 	cfile.Close()
 }
 
-func (c *Config) appendDriver(drv candevice.CanDevice) {
+func (c *Config) appendDriver(drv api.CanDevice) {
 	var next_id int
 	next_id = 0
 	for i:= range c.Drivers {
@@ -67,6 +68,6 @@ func (c *Config) appendDriver(drv candevice.CanDevice) {
 	c.Drivers = append(c.Drivers, drv)
 }
 
-func (c *Config) GetDrivers() []candevice.CanDevice {
+func (c *Config) GetDrivers() []api.CanDevice {
 	return c.Drivers
 }

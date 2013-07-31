@@ -4,11 +4,11 @@
 package webserver
 
 import (
+	"canibus/api"
 	"canibus/core"
 	"canibus/logger"
-	"canibus/api"
 	"canibus/canibususer"
-	"canibus/candevice"
+	"canibus/hacksession"
 	"fmt"
 	"strconv"
 	"net/http"
@@ -24,7 +24,7 @@ type LobbyTemplate struct {
 }
 
 type ConfigTemplate struct {
-	Device *candevice.CanDevice
+	Device api.CanDevice
 }
 
 type connection struct {
@@ -111,6 +111,12 @@ func lobbyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	session, _ := store.Get(r, "canibus")
+	userName := session.Values["user"].(string)
+	user, _ := core.GetUserByName(userName)
+	if user.GetDeviceId() != 0 {
+		leaveDevice(user)
+	}
 	data := LobbyTemplate{}
 	data.Host = r.Host
 	data.Config = core.GetConfig()
@@ -140,6 +146,17 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, dev_err.Error(), http.StatusNotFound)
 		return
 	}
+	session, _ := store.Get(r, "canibus")
+	userName := session.Values["user"].(string)
+	user, _ := core.GetUserByName(userName)
+	// Now that we know we have a device setup hack session
+	if dev.GetHackSession() == nil {
+		hacks := hacksession.HackSession{}
+		hacks.SetState(hacksession.STATE_CONFIG)
+		hacks.SetDeviceId(dev.GetId())
+		user.SetDeviceId(dev.GetId())
+		dev.SetHackSession(&hacks)
+	}
 	data := ConfigTemplate{}
 	data.Device = dev
         exec_err := t.Execute(w, data)
@@ -150,6 +167,23 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 
 func hacksessionHandler(w http.ResponseWriter, r *http.Request) {
 
+}
+
+// Cleans up user module when exiting a device
+func leaveDevice(user api.User) {
+	dev_id := user.GetDeviceId()
+	if dev_id == 0 {
+		return
+	}
+	dev, _ := core.GetDeviceById(dev_id)
+	hax := dev.GetHackSession()
+	if hax == nil {
+		return
+	}
+	hax.RemoveUser(user)
+	if hax.NumOfUsers() == 0 {
+		dev.SetHackSession(nil)
+	}
 }
 
 func (h *hub) run() {
