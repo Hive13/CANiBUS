@@ -3,6 +3,7 @@ package candevice
 import (
 	"canibus/api"
 	"canibus/logger"
+	"canibus/obd"
 	"github.com/tarm/goserial"
 	"encoding/hex"
 	"io"
@@ -41,6 +42,9 @@ func (e *Elm327) Init() bool {
 	vin := e.GetVIN()
 	fmt.Println("got vin: ", vin)
 	e.Desc = "VIN: " + vin
+	fmt.Println("Year: ", obd.GetYearFromVIN(vin))
+	fmt.Println("Make: ", obd.GetMakeFromVIN(vin))
+	fmt.Println("Model info: ", obd.GetModelFromVIN(vin))
 	return true
 }
 
