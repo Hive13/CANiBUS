@@ -46,6 +46,10 @@ func (c *Config) LoadConfig(conf string) {
 					dev := &candevice.Simulator{}
 					dev.SetPacketFile(elem[i].DeviceFile)
 					c.appendDriver(dev)
+				} else if elem[i].DeviceType == "elm327" {
+					dev := &candevice.Elm327{}
+					dev.SetSerial(elem[i].DeviceSerial)
+					c.appendDriver(dev)
 				} else {
 					fmt.Printf("Unknown config setting: %+v\n", elem[i])
 				}
