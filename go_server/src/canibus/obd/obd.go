@@ -368,6 +368,81 @@ var GMSeries = map[string]string {
 	"ZF" : "Base 4 cyl",
 }
 
+var HondaModels = map[string]string {
+	"AB"  : "Prelude",
+	"AD"  : "Accord",
+	"AE"  : "Civic 1300cc CRX",
+	"AF"  : "Civic 1500cc CRX",
+	"AG"  : "Civic 1300cc 3 door",
+	"AH"  : "Civic 1500cc 3 door",
+	"AK"  : "Civic 1500cc 4 door",
+	"AN"  : "Civic wagon",
+	"AR"  : "Civic wagon 4x4",
+	"BA"  : "Accord",
+	"BA3" : "Prelude",
+	"BA4" : "Prelude",
+	"BA6" : "Prelude",
+	"CA5" : "Accord",
+	"CA6" : "Accord coupe",
+	"EC1" : "Civic CRX",
+	"EC2" : "Civic 1300",
+	"EC3" : "Civic 1500",
+	"EC4" : "Civic 4 Door Segan",
+	"EC5" : "Civic Wagon",
+	"EC6" : "Civic Wagon 4x5",
+	"ED3" : "Civic Sedan",
+	"ED6" : "Civic Hatchback",
+	"ED7" : "Civic Hatchback",
+	"ED8" : "Civic CRX",
+	"ED9" : "Civic CRX",
+	"EE2" : "Civic Wagon",
+	"EE4" : "Civic Wagon",
+	"EY1" : "Civic Wagovan",
+	"EY3" : "Civic Wagovan",
+	"BA8" : "Prelude", // 1990-1998
+	"BB1" : "Prelude VTEC",
+	"BB2" : "Prelude",
+	"BB6" : "Prelude 2-door",
+	"CB3" : "Japan Accord",
+	"CB7" : "Accord",
+	"CB9" : "Accord Wagon",
+	"CC1" : "Accord coupe",
+	"CD5" : "Accord 4 door",
+	"CD7" : "Accord 2 door",
+	"CE1" : "Accord wagon",
+	"CE6" : "Accord 4 door",
+	"CF8" : "Accord 4 door SOHC",
+	"CF4" : "Accord 4 door DOHC",
+	"CG1" : "Accord 4 door V6 VTEC",
+	"CG2" : "Accord 2 door V6 VTEC",
+	"CG3" : "Accord 2 door",
+	"CG5" : "Accord 4 door VTEC",
+	"CG6" : "Accord 4 door ULEV",
+	"ED4" : "Civic 4 door",
+	"EE8" : "CRX VTEC",
+	"EE9" : "Civic VTEC",
+	"EG1" : "Civic del sol",
+	"EG2" : "Civic del sol VTEC",
+	"EG6" : "Civic 3 door hatchback",
+	"EG8" : "Civic 4 door",
+	"EH2" : "Civic 3 door",
+	"EH6" : "Civic del sol",
+	"EH9" : "Civic 4 door",
+	"EJ1" : "Civic 2 door",
+	"EJ2" : "Civic 2 door",
+	"EJ6" : "Civic",
+	"EJ7" : "Civic 2 door",
+	"EJ8" : "Civic 2/3 door",
+	"EJ9" : "Civic 3 door",
+	"EL1" : "Orthia 5 door wagon",
+	"EL2" : "Orthia 5 door wagon",
+	"EL3" : "Orthia 5 door wagon 4WD",
+	"RA1" : "Odyssey",
+	"RA3" : "Odyssey 5 door wagon",
+	"RD1" : "CR-V 5 door 4WD",
+	"RD2" : "CR-V 4 door",
+}
+
 type VehicleAttributes struct {
 	Model string
 	BodyType string
@@ -400,6 +475,8 @@ func GetModelFromVIN(vin string) VehicleAttributes {
 	v := VehicleAttributes{Model: "Unkown"}
 	if manuf == "Tesla" {
 		v = parseTeslaVDS(vds, vin, v)
+	} else if manuf == "Honda" {
+		v = parseHondaVDS(vds, vin, v)
 	} else if wmi == "1G1" || wmi == "2G1" || wmi == "3G1" || wmi == "KL1" || wmi == "9BG" || wmi == "8AG" || wmi == "8GG" || wmi == "8Z1" || wmi == "KLA" || wmi == "1G2" || wmi == "2G2" || wmi == "3G2" || wmi == "3G2" || wmi == "5Y2" || wmi == "6G2" || wmi == "KL2" || wmi == "KL2" || wmi == "1G3" || wmi == "2G3" || wmi == "1G4" || wmi == "2G4" || wmi == "3G4" || wmi == "1G6" || wmi == "W06" || wmi == "1G8" || wmi == "W08" {
 		v = parseGMVDS(vds, vin, v)
 	}
@@ -541,6 +618,21 @@ func GetYearFromVIN(vin string) string {
 ////////////////////////
 /// VIN/VDS Decoders ///
 ////////////////////////
+func parseHondaVDS(vds []byte, vin string, v VehicleAttributes) VehicleAttributes {
+	// Honestly this should be parsed and grouped by year. Maybe later
+	// TODO: Complete this decoder properly with year calculations
+	m, ok := HondaModels[string(vds[0:3])]
+	if !ok {
+		m, ok = HondaModels[string(vds[0:2])]
+		if ok {
+			v.Model = m
+		}
+	} else {
+		v.Model = m
+	}
+	return v
+}
+
 func parseGMVDS(vds []byte, vin string, v VehicleAttributes) VehicleAttributes {
 	series := string(vds[0:2])
 	m, ok := GMSeries[series]
