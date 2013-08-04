@@ -1,12 +1,15 @@
     <TABLE id="lobbyTbl">
       <tr id=lobbyHeaderRow>
-        <th>Interface</th><th>Vehicle Info</th><th>Session</th><th>Action</th>
+        <th id=first class="lobbyHdr">Interface</th>
+        <th class="lobbyHdr">Vehicle Info</th>
+        <th class="lobbyHdr">Session</th>
+        <th id=last class="lobbyHdr">Action</th>
       </tr>
        <tr ng-class-odd="'lobbyDevRowOdd'" ng-class-even="'lobbyDevRowEven'"ng-repeat="device in devices">
-         <td>{{device.DeviceType}}</td>
-         <td>{{device.DeviceDesc}}</td>
-         <td>{{device.HackSession}}</td>
-         <td id="lobbyAction"><div ng-switch on="device.HackSession">
+         <td class="lobbyDev">{{device.DeviceType}}</td>
+         <td class="lobbyDev">{{device.DeviceDesc}}</td>
+         <td class="lobbyDev">{{device.HackSession}}</td>
+         <td id="lobbyAction" class="lobbyDev"><div ng-switch on="device.HackSession">
              <div ng-switch-when="Idle">
                 <a href="/candevice/{{device.Id}}/config" class="btn btn-primary">Config</a>
              </div>
@@ -17,12 +20,10 @@
        </tr>
     </TABLE>
     <HR>
-    <B>Lobby Chat</B><BR>
+    <h3>Lobby Chat</h3><BR>
     <div id="chatLobby"></div>
     <FORM id=chatForm>
-      <INPUT type=text id=lobbyChatMsg size=64>
-      <INPUT type=submit value="Send">
+      <INPUT type=text id=lobbyChatMsg >
     </FORM>
-    <BR>
     <DIV>Connected users: </DIV>
     <A href="/logout">Logout</A><BR>
