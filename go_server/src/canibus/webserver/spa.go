@@ -94,6 +94,7 @@ func StartSPAWebListener(root string, ip string, port string) error {
 	r := mux.NewRouter()
 	r.HandleFunc("/", homeHandler)
 	r.HandleFunc("/login", loginHandler)
+	r.HandleFunc("/logout", logoutHandler)
 	r.HandleFunc("/partials/lobby.html", partialLobbyHandler)
 	r.HandleFunc("/candevice/{id}/config", configCanHandler)
 	r.HandleFunc("/candevice/{id}/join", joinHaxHandler)
@@ -102,6 +103,9 @@ func StartSPAWebListener(root string, ip string, port string) error {
 	http.Handle("/partials/",http.FileServer(http.Dir(root)))
 	http.Handle("/js/",http.FileServer(http.Dir(root)))
 	http.Handle("/css/", http.FileServer(http.Dir(root)))
+	http.Handle("/fonts/", http.FileServer(http.Dir(root)))
+	http.Handle("/images/", http.FileServer(http.Dir(root)))
+	http.Handle("/bootstrap/", http.FileServer(http.Dir(root)))
 	http.Handle("/", r)
         remote := ip + ":" + port
         logger.Log("Starting CANiBUS Web server on " + remote)

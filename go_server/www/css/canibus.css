@@ -1,3 +1,25 @@
+#lobbyTbl {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#lobbyHeaderRow {
+  background-color: #2ecc71;
+}
+
+.lobbyDevRowOdd {
+  background-color: #ecf0f1;
+}
+
+.lobbyDevRowEven {
+  background-color: #bdc3c7;
+}
+
+#lobbyAction {
+  text-align:center;
+}
+
 .animate-enter {
   -webkit-transition: 10s linear all;
   transition: 10s linear all;
