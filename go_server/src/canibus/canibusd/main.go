@@ -33,6 +33,15 @@ func launchTCPServer() {
 	}
 }
 
+func launchSPAWebServer() {
+	err := webserver.StartSPAWebListener(*wwwRoot, *bindIP, *wwwPort)
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
+
+}
+
 func launchWebServer() {
 	err := webserver.StartWebListener(*wwwRoot, *bindIP, *wwwPort)
 	if err != nil {
@@ -48,5 +57,5 @@ func main() {
 	core.LoadConfig(*configFile)
 	server.InitDrivers()
 	go launchTCPServer()
-	launchWebServer()
+	launchSPAWebServer()
 }

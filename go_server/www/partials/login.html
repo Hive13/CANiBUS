@@ -1,0 +1,11 @@
+<FORM name="loginFrm" ng-submit="login()" ng-controller="loginController">
+  <TABLE>
+    <TR>
+      <TD>Username:</TD>
+      <TD>
+        <INPUT type=text ng-model="username" required>
+        <span class="error" ng-show="loginFrm.input.$error.required">*</span>
+      </TD>
+    <TR>
+  </TABLE>
+</FORM>

@@ -1,0 +1,28 @@
+    <TABLE>
+      <tr>
+        <th>Interface</th><th>Vehicle Info</th><th>Session</th><th>Action</th>
+      </tr>
+       <tr ng-repeat="device in devices">
+         <td>{{device.DeviceType}}</td>
+         <td>{{device.DeviceDesc}}</td>
+         <td>{{device.HackSession}}</td>
+         <td><div ng-switch on="device.HackSession">
+             <div ng-switch-when="Idle">
+                <a href="/candevice/{{device.Id}}/config">Config</a>
+             </div>
+             <div ng-switch-default>
+                <a href="/candevice/{{device.Id}}/join">Join</a>
+             </div>
+         </td>
+       </tr>
+    </TABLE>
+    <HR>
+    <B>Lobby Chat</B><BR>
+    <div id="chatLobby"></div>
+    <FORM id=chatForm>
+      <INPUT type=text id=lobbyChatMsg size=64>
+      <INPUT type=submit value="Send">
+    </FORM>
+    <BR>
+    <DIV>Connected users: </DIV>
+    <A href="/logout">Logout</A><BR>

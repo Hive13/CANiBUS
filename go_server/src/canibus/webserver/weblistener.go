@@ -85,6 +85,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	user := r.FormValue("username")
+	logger.Log("User logged in: " + user)
 	cmd := &api.Cmd{}
 	cmd.Action = "Login"
 	cmd.Arg = make([]string, 1)
@@ -97,10 +98,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "canibus")
 	session.Values["user"] = user
 	session.Save(r, w)
+	logger.Log("Cookie saved")
 	var NewUser canibususer.CanibusUser
 	NewUser.SetName(user)
 	core.AddUser(&NewUser)
-	http.Redirect(w, r, "/lobby", http.StatusFound)
+	fmt.Fprintf(w, "OK")
+	//http.Redirect(w, r, "/#/lobby", http.StatusFound)
 }
 
 func lobbyHandler(w http.ResponseWriter, r *http.Request) {

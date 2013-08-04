@@ -1,0 +1,9 @@
+.animate-enter {
+  -webkit-transition: 10s linear all;
+  transition: 10s linear all;
+  opacity: 0;
+}
+
+.animate-enter.animate-enter-active {
+  opacity: 1;
+}
