@@ -45,11 +45,11 @@ func (c *Config) LoadConfig(conf string) {
 				if elem[i].DeviceType == "simulator" {
 					dev := &candevice.Simulator{}
 					dev.SetPacketFile(elem[i].DeviceFile)
-					c.appendDriver(dev)
+					c.AppendDriver(dev)
 				} else if elem[i].DeviceType == "elm327" {
 					dev := &candevice.Elm327{}
 					dev.SetSerial(elem[i].DeviceSerial)
-					c.appendDriver(dev)
+					c.AppendDriver(dev)
 				} else {
 					fmt.Printf("Unknown config setting: %+v\n", elem[i])
 				}
@@ -59,7 +59,7 @@ func (c *Config) LoadConfig(conf string) {
 	cfile.Close()
 }
 
-func (c *Config) appendDriver(drv api.CanDevice) {
+func (c *Config) AppendDriver(drv api.CanDevice) int {
 	var next_id int
 	next_id = 0
 	for i:= range c.Drivers {
@@ -70,6 +70,7 @@ func (c *Config) appendDriver(drv api.CanDevice) {
 	next_id += 1
 	drv.SetId(next_id)
 	c.Drivers = append(c.Drivers, drv)
+	return drv.GetId()
 }
 
 func (c *Config) GetDrivers() []api.CanDevice {

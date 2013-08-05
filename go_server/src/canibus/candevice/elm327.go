@@ -17,11 +17,26 @@ type Elm327 struct {
 	Desc string
 	VIN string
 	id int
+	Year string
+	Make string
+	VehicleAttributes obd.VehicleAttributes
 	HackSession api.HackSession
 }
 
 func (e *Elm327) SetSerial(port string) {
 	e.SerialPort = port
+}
+
+func (e *Elm327) GetYear() string {
+	return e.Year
+}
+
+func (e *Elm327) GetMake() string {
+	return e.Make
+}
+
+func (e *Elm327) GetModel() string {
+	return e.VehicleAttributes.Model
 }
 
 func (e *Elm327) Init() bool {
@@ -42,9 +57,9 @@ func (e *Elm327) Init() bool {
 	vin := e.GetVIN()
 	fmt.Println("got vin: ", vin)
 	e.Desc = "VIN: " + vin
-	fmt.Println("Year: ", obd.GetYearFromVIN(vin))
-	fmt.Println("Make: ", obd.GetMakeFromVIN(vin))
-	fmt.Println("Model info: ", obd.GetModelFromVIN(vin))
+	e.Year = obd.GetYearFromVIN(vin)
+	e.Make = obd.GetMakeFromVIN(vin)
+	e.VehicleAttributes = obd.GetModelFromVIN(vin)
 	return true
 }
 

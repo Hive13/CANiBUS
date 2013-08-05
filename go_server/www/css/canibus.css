@@ -67,12 +67,43 @@ input#loginUserTxt {
   height: 25px;
 }
 
+a#AddSimBtn {
+  margin-left: 50px;
+}
+
 .animate-enter {
-  -webkit-transition: 10s linear all;
-  transition: 10s linear all;
+  -webkit-transition: 1s linear all;
+  transition: 1s linear all;
   opacity: 0;
 }
 
 .animate-enter.animate-enter-active {
   opacity: 1;
+}
+
+.fade { height: 50px; }
+
+.fade-show-setup,.fade-hide-setup {
+  -webkit-transition:all linear 0.3s;
+  -moz-transition:all linear 0.3s;
+  -ms-transition:all linear 0.3s;
+  -o-transition:all linear 0.3s;
+  transition:all linear 0.3s;
+}
+
+.fade-show-setup{
+      opacity:0;
+      height: 0;
+}
+.fade-hide-setup{
+      opacity:1;
+      height: 0;
+}
+.fade-show-setup.fade-show-start {
+      opacity: 1;
+      height: 50px;
+}
+.fade-hide-setup.fade-hide-start{
+        opacity:0;
+        height: 50px;
 }

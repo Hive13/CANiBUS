@@ -5,9 +5,12 @@
         <th class="lobbyHdr">Session</th>
         <th id=last class="lobbyHdr">Action</th>
       </tr>
-       <tr ng-class-odd="'lobbyDevRowOdd'" ng-class-even="'lobbyDevRowEven'"ng-repeat="device in devices">
+       <tr ng-class-odd="'lobbyDevRowOdd'" ng-class-even="'lobbyDevRowEven'" ng-repeat="device in devices" ng-click="showDetails = ! showDetails">
          <td class="lobbyDev">{{device.DeviceType}}</td>
-         <td class="lobbyDev">{{device.DeviceDesc}}</td>
+         <td class="lobbyDev">
+            {{device.DeviceDesc}}
+            <div ng-show="showDetails" ng-animate="'animate'">{{device.Year}} {{device.Make}} {{device.Model}}</div>
+         </td>
          <td class="lobbyDev">{{device.HackSession}}</td>
          <td id="lobbyAction" class="lobbyDev"><div ng-switch on="device.HackSession">
              <div ng-switch-when="Idle">
@@ -19,6 +22,8 @@
          </td>
        </tr>
     </TABLE>
+    <br>
+    <a id="AddSimBtn" ng-click="AddSimulator()" class="btn btn-info">Add Simulator</a>
     <HR>
     <h3>Lobby Chat</h3><BR>
     <div id="chatLobby"></div>

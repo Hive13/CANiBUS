@@ -49,11 +49,53 @@ controllers.loginController = function($scope, $http, $location) {
 
 };
 
-controllers.lobbyController = function($scope, $http) {
+controllers.lobbyController = function($scope, $http, $timeout) {
 
-  $http.get("/candevices").success(function(data, status) {
-    $scope.devices = data
-  });
+  $scope.devices = []
+
+  function DevInList(dev) {
+    for (var i = 0; i < $scope.devices.length; i++) {
+      if($scope.devices[i].Id == dev.Id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function addDevices(devices) {
+    var changed = false;
+    angular.forEach(devices, function(dev) {
+      if (!DevInList(dev)) {
+        $scope.devices.push(dev);
+        changed = true;
+      } else {
+        for(var i = 0; i < $scope.devices.length; i++) {
+          if($scope.devices[i].Id == dev.Id) {
+            if($scope.devices[i].HackSession != dev.HackSession) {
+              $scope.devices[i].HackSession = dev.HackSession;
+              changed = true;
+            }
+          }
+        }
+      }
+    });
+    $timeout(function() { $scope.fetchDevices(); }, 3000);
+  }
+
+  $scope.fetchDevices = function() {
+    $http.get("/candevices").success(function(data, status) {
+      addDevices(data);
+    });
+  }
+
+  $scope.AddSimulator = function() {
+    $http.get("/lobby/AddSimulator").success(function(data, status) {
+      $scope.devices.push(data);
+    });
+  }
+
+  $scope.fetchDevices();
+  $timeout(function() { $scope.fetchDevices(); }, 3000);
 };
 
 controllers.configController = function($scope) {

@@ -9,6 +9,7 @@ import (
 type Configer interface {
 	GetDrivers() []CanDevice
 	LoadConfig(conf string)
+	AppendDriver(CanDevice) int
 }
 
 type User interface {
@@ -26,6 +27,9 @@ type CanDevice interface {
         SetId(int)
         GetHackSession() HackSession
         SetHackSession(HackSession)
+	GetYear() string
+	GetMake() string
+	GetModel() string
 }
 
 type HackSession interface {

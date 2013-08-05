@@ -72,3 +72,14 @@ func (sim *Simulator) SetId(id int) {
 	sim.id = id
 }
 
+func (sim *Simulator) GetYear() string {
+	return ""
+}
+
+func (sim *Simulator) GetMake() string {
+	return ""
+}
+
+func (sim *Simulator) GetModel() string {
+	return ""
+}
