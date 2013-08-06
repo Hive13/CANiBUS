@@ -14,15 +14,10 @@ canibus.config(function ($routeProvider) {
 	controller: 'lobbyController',
 	templateUrl: 'partials/lobby.html'
       })
-    .when('/candevice/:id/config',
+    .when('/candevice/:id/:action',
       {
 	controller: 'configController',
-	templateUrl: 'partials/config.html'
-      })
-    .when('/candevice/:id/join',
-      {
-	controller: 'haxController',
-	templateUrl: 'partials/config.html'
+	templateUrl: '/partials/urlRouter.html'
       })
     .otherwise({ redirectTo: "/" });
 });
@@ -98,7 +93,23 @@ controllers.lobbyController = function($scope, $http, $timeout) {
   $timeout(function() { $scope.fetchDevices(); }, 3000);
 };
 
-controllers.configController = function($scope) {
+controllers.configController = function($scope, $http, $location, $routeParams) {
+  $scope.isMaster = function() {
+    if($location.path().indexOf("config", $location.path().length - 6) == 13) {
+      return true;
+    }
+    return false;
+  }
+
+  $scope.TemplateUrl = 'candevice/' + $routeParams.id + '/' + $routeParams.action;
+
+  $scope.getInfo = function(id) {
+    $http.get("/candevice/" + id + "/info").success(function(data, status) {
+      $scope.device = data
+    });
+  }
+
+  $scope.getInfo($routeParams.id);  
 
 };
 

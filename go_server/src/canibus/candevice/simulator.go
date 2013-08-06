@@ -4,8 +4,7 @@ import (
 	"canibus/api"
 	"canibus/logger"
 	"encoding/json"
-	"os"
-	"io"
+	"io/ioutil"
 )
 
 type Simulator struct {
@@ -21,31 +20,28 @@ func (sim *Simulator) SetPacketFile(packets string) {
 
 func (sim *Simulator) Init() bool {
 	logger.Log("Loading packets from " + sim.PacketFile)
-	packets, err := os.Open(sim.PacketFile)
+	err := sim.LoadCanDataFromFile(sim.PacketFile)
 	if err != nil {
-		logger.Log("Could not open Simulator data file")
 		return false
 	}
-	buf := make([]byte, 1024)
-	var canPacket []CanData
-	for {
-		n, err := packets.Read(buf)
-		if err != nil && err != io.EOF {
-			logger.Log("Could not read Simulator data file")
-			return false
-		}
-		if n == 0 {
-			break
-		}
-		err = json.Unmarshal(buf, &canPacket)
-		if err != nil {
-			logger.Log("Problem with json unmarshal sim data")
-		} else {
-			sim.Packets = append(sim.Packets, canPacket...)
-		}
-	}
-	packets.Close()
 	return true
+}
+
+func (sim *Simulator) LoadCanDataFromFile(file string) error {
+	packets, err := ioutil.ReadFile(sim.PacketFile)
+	if err != nil {
+		logger.Log("Could not open Simulator data file")
+		return err
+	}
+	var canPacket []CanData
+	err = json.Unmarshal(packets, &canPacket)
+	if err != nil {
+		logger.Log("Problem with json unmarshal sim data")
+		return err
+	} else {
+		sim.Packets = canPacket
+	}
+	return nil
 }
 
 func (sim *Simulator) DeviceDesc() string {

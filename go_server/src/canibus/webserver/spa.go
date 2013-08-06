@@ -111,6 +111,30 @@ func addSimHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", j)
 }
 
+func candeviceInfoHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	canId, canId_err := strconv.Atoi(vars["id"])
+	if canId_err != nil {
+		http.Error(w, canId_err.Error(), http.StatusNotFound)
+		return
+	}
+	dev, dev_err := core.GetDeviceById(canId)
+	if dev_err != nil {
+		http.Error(w, dev_err.Error(), http.StatusNotFound)
+		return
+	}
+	data := CanDeviceJSON{}
+        data.Id = dev.GetId()
+	data.DeviceType = dev.DeviceType()
+	data.DeviceDesc = dev.DeviceDesc()
+	j, err := json.Marshal(data)
+	if err != nil {
+		logger.Log("Could not convert candevices to json")
+		return
+	}
+	fmt.Fprintf(w, "%s", j)
+}
+
 func candevicesHandler(w http.ResponseWriter, r *http.Request) {
 	config := core.GetConfig()
 	drivers := config.GetDrivers()
@@ -148,6 +172,7 @@ func StartSPAWebListener(root string, ip string, port string) error {
 	r.HandleFunc("/partials/lobby.html", partialLobbyHandler)
 	r.HandleFunc("/candevice/{id}/config", configCanHandler)
 	r.HandleFunc("/candevice/{id}/join", joinHaxHandler)
+	r.HandleFunc("/candevice/{id}/info", candeviceInfoHandler)
 	r.HandleFunc("/candevices", candevicesHandler)
 	r.HandleFunc("/lobby/AddSimulator", addSimHandler)
 

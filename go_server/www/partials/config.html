@@ -1,3 +1,20 @@
-<div>Configuration</div>
+<h2>{{device.DeviceType}} Configuration</h2>
 <br>
-<a href="/#/lobby">Return to Lobby</a>
+<div ng-switch on="device.DeviceType">
+  <div ng-switch-when="Simulator">
+    <div ng-include src="'/partials/sim-config.html'"></div>
+  </div>
+  <div ng-switch-default>
+    No configuration options available.
+  </div>
+</div>
+<br>
+<a href="/#/lobby" class="btn btn-info">Lobby</a>
+<div ng-switch on="isMaster()">
+  <div ng-switch-when="true">
+    <a href="/#/candevice/{{device.Id}}/hax" class="btn btn-primary">Start</a>
+  </div>
+  <div ng-switch-default>
+    <a href="/#/" class="btn disabled">Start</a>
+  </div>
+</div>

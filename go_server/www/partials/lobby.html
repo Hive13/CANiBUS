@@ -14,10 +14,10 @@
          <td class="lobbyDev">{{device.HackSession}}</td>
          <td id="lobbyAction" class="lobbyDev"><div ng-switch on="device.HackSession">
              <div ng-switch-when="Idle">
-                <a href="/candevice/{{device.Id}}/config" class="btn btn-primary">Config</a>
+                <a href="/#/candevice/{{device.Id}}/config" class="btn btn-primary">Config</a>
              </div>
              <div ng-switch-default>
-                <a href="/candevice/{{device.Id}}/join" class="btn btn-primary">Join</a>
+                <a href="/#/candevice/{{device.Id}}/join" class="btn btn-primary">Join</a>
              </div>
          </td>
        </tr>
