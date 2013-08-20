@@ -19,6 +19,11 @@ canibus.config(function ($routeProvider) {
 	controller: 'configController',
 	templateUrl: '/partials/urlRouter.html'
       })
+    .when('/hax/:id',
+      {
+	controller: 'haxController',
+	templateUrl: '/partials/sniff.html'
+      })
     .otherwise({ redirectTo: "/" });
 });
 
@@ -113,8 +118,46 @@ controllers.configController = function($scope, $http, $location, $routeParams) 
 
 };
 
-controllers.haxController = function($scope) {
+controllers.haxController = function($scope, $http, $timeout, $routeParams) {
+  $scope.packets = [];
+  $scope.id = $routeParams.id;
 
+  function PacketInList(pkt) {
+    for (var i = 0; i < $scope.packets.length; i++) {
+      if($scope.packets[i].SeqNo == pkt.SeqNo) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function addPackets(packets) {
+    var changed = false;
+    angular.forEach(packets, function(pkt) {
+      if (!PacketInList(pkt)) {
+        $scope.packets.push(pkt);
+        changed = true;
+      } else {
+	/* Not needed for SeqNo views 
+        for(var i = 0; i < $scope.packets.length; i++) {
+        }
+	*/
+      }
+    });
+    $timeout(function() { $scope.fetchPackets($scope.id); }, 3000);
+  }
+
+  $scope.StartSniffer = function(id) {
+    $http.get("/hax/" + id + "/start").success(function(data, status) {
+      $timeout(function() { $scope.fetchPackets($scope.id); }, 3000);
+    });
+  }
+
+  $scope.fetchPackets = function(id) {
+    $http.get("/hax/" + id + "/packets").success(function(data, status) {
+      addPackets(data);  
+    });
+  }
 };
 
 canibus.controller(controllers);

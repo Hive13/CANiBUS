@@ -7,6 +7,7 @@ import (
 type CanibusUser struct {
 	Name string
 	DeviceId int
+	lastIdx int // Index values for packet sequences
 }
 
 func (u *CanibusUser) GetName() string {
@@ -23,4 +24,12 @@ func (u *CanibusUser) GetDeviceId() int {
 
 func (u *CanibusUser) SetDeviceId(id int) {
 	u.DeviceId = id
+}
+
+func (u *CanibusUser) LastIdx() int {
+	return u.lastIdx
+}
+
+func (u *CanibusUser) SetLastIdx(idx int) {
+	u.lastIdx = idx
 }

@@ -12,9 +12,9 @@
 <a href="/#/lobby" class="btn btn-info">Lobby</a>
 <div ng-switch on="isMaster()">
   <div ng-switch-when="true">
-    <a href="/#/candevice/{{device.Id}}/hax" class="btn btn-primary">Start</a>
+    <a href="/#/hax/{{device.Id}}" class="btn btn-primary">Start</a>
   </div>
   <div ng-switch-default>
-    <a href="/#/" class="btn disabled">Start</a>
+    <a href="" class="btn disabled">Start</a>
   </div>
 </div>

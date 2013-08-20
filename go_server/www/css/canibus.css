@@ -50,6 +50,17 @@ th#last {
   width: 50%;
 }
 
+#packetChatMsg {
+  margin-left: 10px;
+  width: 50%;
+}
+
+#packetChatLobby {
+  margin-left: 10px;
+  width: 50%;
+}
+
+
 table#loginTbl {
   margin-left: auto;
   margin-right: auto;
@@ -69,6 +80,10 @@ input#loginUserTxt {
 
 a#AddSimBtn {
   margin-left: 50px;
+}
+
+table#packetsTbl {
+  width: 90%;
 }
 
 .animate-enter {

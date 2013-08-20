@@ -21,6 +21,7 @@ type Elm327 struct {
 	Make string
 	VehicleAttributes obd.VehicleAttributes
 	HackSession api.HackSession
+	packetIdx int
 }
 
 func (e *Elm327) SetSerial(port string) {
@@ -244,4 +245,21 @@ func (e *Elm327) toStrings(pkt []byte) []string {
 	}
 	lines = append(lines, string(pkt[start:]))
 	return lines
+}
+
+func (e *Elm327) StartSniffing() {
+
+}
+
+func (e *Elm327) StopSniffing() {
+
+}
+
+func (e *Elm327) GetPacketsFrom(idx int) ([]api.CanData, int) {
+	var pkts []api.CanData
+	return pkts, e.packetIdx
+}
+
+func (e *Elm327) GetPacketIdx() int {
+	return e.packetIdx
 }

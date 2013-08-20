@@ -48,6 +48,79 @@ func partialLobbyHandler(w http.ResponseWriter, r *http.Request) {
         fmt.Fprintf(w, "%s", p.Body)
 }
 
+func haxStartHandler(w http.ResponseWriter, r *http.Request) {
+	logger.Log("Start Sniffer")
+	auth_err := checkAuth(w, r)
+	if auth_err != nil { return }
+	vars := mux.Vars(r)
+	canId, canId_err := strconv.Atoi(vars["id"])
+	if canId_err != nil {
+		http.Error(w, canId_err.Error(), http.StatusNotFound)
+		return
+	}
+	dev, dev_err := core.GetDeviceById(canId)
+	if dev_err != nil {
+		http.Error(w, dev_err.Error(), http.StatusNotFound)
+		return
+	}
+	session, _ := store.Get(r, "canibus")
+	userName := session.Values["user"].(string)
+	user, _ := core.GetUserByName(userName)
+
+	hax := dev.GetHackSession()
+	if hax == nil {
+		http.Error(w, "Session not configured", http.StatusNotFound)
+		return
+	}
+	if !hax.IsActiveUser(user) {
+		http.Error(w, "You are not a part of this hacksession", http.StatusNotFound)
+		return
+	}
+	if hax.GetStateValue() != hacksession.STATE_SNIFF {
+		hax.SetState(hacksession.STATE_SNIFF)
+		dev.StartSniffing()
+	}
+        fmt.Fprintf(w, "%s", "OK")
+}
+
+func haxPacketsHandler(w http.ResponseWriter, r *http.Request) {
+	logger.Log("Sniffer hax")
+	auth_err := checkAuth(w, r)
+	if auth_err != nil { return }
+	vars := mux.Vars(r)
+	canId, canId_err := strconv.Atoi(vars["id"])
+	if canId_err != nil {
+		http.Error(w, canId_err.Error(), http.StatusNotFound)
+		return
+	}
+	dev, dev_err := core.GetDeviceById(canId)
+	if dev_err != nil {
+		http.Error(w, dev_err.Error(), http.StatusNotFound)
+		return
+	}
+	session, _ := store.Get(r, "canibus")
+	userName := session.Values["user"].(string)
+	user, _ := core.GetUserByName(userName)
+
+	hax := dev.GetHackSession()
+	if hax == nil {
+		http.Error(w, "Session not configured", http.StatusNotFound)
+		return
+	}
+	if !hax.IsActiveUser(user) {
+		http.Error(w, "You are not a part of this hacksession", http.StatusNotFound)
+		return
+	}
+	packets := hax.GetPackets(user)
+
+	j, err := json.Marshal(packets)
+	if err != nil {
+		logger.Log("Could not convert can packets to json")
+		return
+	}
+	fmt.Fprintf(w, "%s", j)
+}
+
 func configCanHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Log("Config CAN Device, checking auth...")
 	auth_err := checkAuth(w, r)
@@ -70,9 +143,10 @@ func configCanHandler(w http.ResponseWriter, r *http.Request) {
 	if dev.GetHackSession() == nil {
 		hacks := hacksession.HackSession{}
 		hacks.SetState(hacksession.STATE_CONFIG)
-		hacks.SetDeviceId(dev.GetId())
+		hacks.SetDevice(dev)
 		user.SetDeviceId(dev.GetId())
 		dev.SetHackSession(&hacks)
+		hacks.AddUser(user)
 	}
 
         p, err := loadPage("partials/config.html")
@@ -173,6 +247,8 @@ func StartSPAWebListener(root string, ip string, port string) error {
 	r.HandleFunc("/candevice/{id}/config", configCanHandler)
 	r.HandleFunc("/candevice/{id}/join", joinHaxHandler)
 	r.HandleFunc("/candevice/{id}/info", candeviceInfoHandler)
+	r.HandleFunc("/hax/{id}/packets", haxPacketsHandler)
+	r.HandleFunc("/hax/{id}/start", haxStartHandler)
 	r.HandleFunc("/candevices", candevicesHandler)
 	r.HandleFunc("/lobby/AddSimulator", addSimHandler)
 

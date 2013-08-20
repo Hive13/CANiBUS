@@ -15,6 +15,7 @@ type HackSession struct {
 	Users []api.User
 	State int
 	DeviceId int
+	Device api.CanDevice
 }
 
 func (s *HackSession)GetState() string {
@@ -24,6 +25,10 @@ func (s *HackSession)GetState() string {
 		return fmt.Sprintf("Active: %d", len(s.Users))
 	}
 	return "Idle"
+}
+
+func (s *HackSession)GetStateValue() int {
+	return s.State
 }
 
 func (s *HackSession)SetState(state int) {
@@ -36,6 +41,11 @@ func (s *HackSession)GetDeviceId() int {
 
 func (s *HackSession)SetDeviceId(id int) {
 	s.DeviceId = id
+}
+
+func (s *HackSession)SetDevice(dev api.CanDevice) {
+	s.Device = dev
+	s.DeviceId = dev.GetId()
 }
 
 func (s *HackSession)NumOfUsers() int {
@@ -56,3 +66,26 @@ func (s *HackSession)RemoveUser(user api.User) {
 	s.Users = newUsers
 }
 
+func (s *HackSession)IsActiveUser(user api.User) bool {
+	for i := range s.Users {
+		if s.Users[i].GetName() == user.GetName() {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *HackSession) GetPackets(user api.User) []api.CanData {
+	var pkts []api.CanData
+	var idx int
+	if s.Device == nil {
+		return pkts
+	}
+	if user.LastIdx() == 0 {	 // First time sniffing
+		user.SetLastIdx(s.Device.GetPacketIdx())
+	}
+	pkts, idx = s.Device.GetPacketsFrom(user.LastIdx())
+	// TODO: Apply filters
+	user.SetLastIdx(idx)
+	return pkts
+}
