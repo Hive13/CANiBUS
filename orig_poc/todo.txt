@@ -1,0 +1,13 @@
+electNewMaster clears logs and doesn't appear to work (at least not in client)
+# of clients joined in a session in lobby
+ability to see what session people join
+handler should call addChat directly
+map<id is crap>
+packets should come down on seprate connection
+serial polling needs to be simplified
+packet last seen time
+sorting
+
+ATH0 - Disables headers
+ATAR - Reset filter masks
+ATMA - Monitor All

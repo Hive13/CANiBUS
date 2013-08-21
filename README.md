@@ -30,11 +30,19 @@ It has a RESTful interface
 
 Routes
 ------
-/                     - Homepage
-/login                - Authentication
-/lobby                - Lobby
-/candevices           - JSON list of CAN devices
-/candevice/:id/config - Configure CAN device
-/candevice/:id/join   - Join a CAN HackSession 
-/candevice/:id/info   - JSON CAN Device info
+*  /                     - Homepage
+*  /login                - Authentication
+*  /lobby                - Lobby
+*  /candevices           - JSON list of CAN devices
+*  /candevice/:id/config - Configure CAN device
+*  /candevice/:id/join   - Join a CAN HackSession 
+*  /candevice/:id/info   - JSON CAN Device info
+*  /hax/:id              - Sniff session on device
+*  /hax/:id/start        - Start the sniffer
+*  /hax/:id/stop         - Stop the sniffer
+*  /hax/:id/packets      - Pending packets
+
+Original PoC
+------------
+The Original C++ and NCurses code is now under the foloer orig_poc/
 
