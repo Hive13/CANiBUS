@@ -52,6 +52,7 @@ type HackSession interface {
 }
 
 type CanData struct {
+	Src string	// Where packet originated
 	SeqNo int
 	AbsTime string
 	RelTime string

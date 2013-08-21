@@ -50,6 +50,18 @@ th#last {
   width: 50%;
 }
 
+#packetHeaderRow {
+  background-color: #2ecc71;
+}
+
+.packetRowOdd {
+  background-color: #ecf0f1;
+}
+
+.packetRowEven {
+  background-color: #bdc3c7;
+}
+
 #packetChatMsg {
   margin-left: 10px;
   width: 50%;
@@ -60,6 +72,11 @@ th#last {
   width: 50%;
 }
 
+.packetToolbar {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 table#loginTbl {
   margin-left: auto;
@@ -83,9 +100,59 @@ a#AddSimBtn {
 }
 
 table#packetsTbl {
-  width: 90%;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -14px;
 }
 
+.byteChange {
+  background-color: #f39c12;
+}
+
+.packetSrc {
+  width: 10em;
+}
+
+.packetNetwork {
+  width: 10em;
+}
+
+.packetArbID {
+  width: 3em;
+}
+
+.packetB1 {
+  width: 3em;
+}
+
+.packetB2 {
+  width: 3em;
+}
+
+.packetB3 {
+  width: 3em;
+}
+
+.packetB4 {
+  width: 3em;
+}
+
+.packetB5 {
+  width: 3em;
+}
+
+.packetB6 {
+  width: 3em;
+}
+
+.packetB7 {
+  width: 3em;
+}
+
+.packetB8 {
+  width: 3em;
+}
 .animate-enter {
   -webkit-transition: 1s linear all;
   transition: 1s linear all;

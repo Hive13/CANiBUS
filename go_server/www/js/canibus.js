@@ -52,6 +52,13 @@ controllers.loginController = function($scope, $http, $location) {
 controllers.lobbyController = function($scope, $http, $timeout) {
 
   $scope.devices = []
+  $scope.devicePromise;
+
+  $scope.$on("$destroy", function() {
+    if($scope.devicePromise) {
+      $timeout.cancel($scope.devicePromise);
+    }
+  });
 
   function DevInList(dev) {
     for (var i = 0; i < $scope.devices.length; i++) {
@@ -79,7 +86,7 @@ controllers.lobbyController = function($scope, $http, $timeout) {
         }
       }
     });
-    $timeout(function() { $scope.fetchDevices(); }, 3000);
+    $scope.devicePromise = $timeout(function() { $scope.fetchDevices(); }, 3000);
   }
 
   $scope.fetchDevices = function() {
@@ -95,7 +102,7 @@ controllers.lobbyController = function($scope, $http, $timeout) {
   }
 
   $scope.fetchDevices();
-  $timeout(function() { $scope.fetchDevices(); }, 3000);
+  $scope.devicePromise = $timeout(function() { $scope.fetchDevices(); }, 3000);
 };
 
 controllers.configController = function($scope, $http, $location, $routeParams) {
@@ -121,6 +128,25 @@ controllers.configController = function($scope, $http, $location, $routeParams) 
 controllers.haxController = function($scope, $http, $timeout, $routeParams) {
   $scope.packets = [];
   $scope.id = $routeParams.id;
+  $scope.predicate = "ArbID";
+  $scope.reverse = false;
+
+  $scope.viewType = "ArbView";
+  var snifferPromise;
+  var pollTimer = 500;
+
+  if($scope.devicePromise) {
+    $timeout.cancel($scope.devicePromise);
+  }
+
+  function PacketArbIDInList(pkt) {
+    for (var i = 0; i < $scope.packets.length; i++) {
+      if($scope.packets[i].ArbID == pkt.ArbID && $scope.packets[i].Network == pkt.Network) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   function PacketInList(pkt) {
     for (var i = 0; i < $scope.packets.length; i++) {
@@ -134,23 +160,102 @@ controllers.haxController = function($scope, $http, $timeout, $routeParams) {
   function addPackets(packets) {
     var changed = false;
     angular.forEach(packets, function(pkt) {
-      if (!PacketInList(pkt)) {
-        $scope.packets.push(pkt);
-        changed = true;
-      } else {
-	/* Not needed for SeqNo views 
-        for(var i = 0; i < $scope.packets.length; i++) {
+      if ($scope.viewType == 'SeqView') {
+        if (!PacketInList(pkt)) {
+          $scope.packets.push(pkt);
+          changed = true;
         }
-	*/
+      } else if ($scope.viewType == 'ArbView') {
+        if (!PacketArbIDInList(pkt)) {
+          $scope.packets.push(pkt);
+          changed = true;
+        } else {
+          for(var i = 0; i < $scope.packets.length; i++) {
+            if($scope.packets[i].ArbID == pkt.ArbID && $scope.packets[i].Network == pkt.Network) {
+              if($scope.packets[i].B1 != pkt.B1) {
+                $scope.packets[i].B1 = pkt.B1;
+                $scope.packets[i].B1changed = true;
+                changed = true;
+              } else {
+                $scope.packets[i].B1changed = false;
+              }
+              if($scope.packets[i].B2 != pkt.B2) {
+                $scope.packets[i].B2 = pkt.B2;
+                $scope.packets[i].B2changed = true;
+                changed = true;
+              } else {
+                $scope.packets[i].B2changed = false;
+              }
+              if($scope.packets[i].B3 != pkt.B3) {
+                $scope.packets[i].B3 = pkt.B3;
+                $scope.packets[i].B3changed = true;
+                changed = true;
+              } else {
+                $scope.packets[i].B3changed = false;
+              }
+              if($scope.packets[i].B4 != pkt.B4) {
+                $scope.packets[i].B4 = pkt.B4;
+                $scope.packets[i].B4changed = true;
+                changed = true;
+              } else {
+                $scope.packets[i].B4changed = false;
+              }
+              if($scope.packets[i].B5 != pkt.B5) {
+                $scope.packets[i].B5 = pkt.B5;
+                $scope.packets[i].B5changed = true;
+                changed = true;
+              } else {
+                $scope.packets[i].B5changed = false;
+              }
+              if($scope.packets[i].B6 != pkt.B6) {
+                $scope.packets[i].B6 = pkt.B6;
+                $scope.packets[i].B6changed = true;
+                changed = true;
+              } else {
+                $scope.packets[i].B6changed = false;
+              }
+              if($scope.packets[i].B7 != pkt.B7) {
+                $scope.packets[i].B7 = pkt.B7;
+                $scope.packets[i].B7changed = true;
+                changed = true;
+              } else {
+                $scope.packets[i].B7changed = false;
+              }
+              if($scope.packets[i].B8 != pkt.B8) {
+                $scope.packets[i].B8 = pkt.B8;
+                $scope.packets[i].B8changed = true;
+                changed = true;
+              } else {
+                $scope.packets[i].B8changed = false;
+              }
+            }
+          }
+        }
       }
     });
-    $timeout(function() { $scope.fetchPackets($scope.id); }, 3000);
+    snifferPromise = $timeout(function() { $scope.fetchPackets($scope.id); }, pollTimer);
+  }
+
+  $scope.StopSniffer = function(id) {
+    $http.get("/hax/" + id + "/stop").success(function(data, status) {
+      $scope.started = false;
+      $timeout.cancel(snifferPromise);
+    });
   }
 
   $scope.StartSniffer = function(id) {
     $http.get("/hax/" + id + "/start").success(function(data, status) {
-      $timeout(function() { $scope.fetchPackets($scope.id); }, 3000);
+      $scope.started = true;
+      snifferPromise = $timeout(function() { $scope.fetchPackets($scope.id); }, pollTimer);
     });
+  }
+
+  $scope.setArbView = function() {
+    $scope.viewType='ArbView';
+  }
+
+  $scope.setSeqView = function() {
+    $scope.viewType='SeqView';
   }
 
   $scope.fetchPackets = function(id) {

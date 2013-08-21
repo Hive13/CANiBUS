@@ -156,6 +156,7 @@ func (sim *Simulator) processPackets() {
 		}
 		*/
 		// FIXME Just temp code to test interface
+		sim.SimPackets[simIdx].Src = "Sim"
 		sim.addPacket(sim.SimPackets[simIdx])
 		simIdx += 1
 		time.Sleep(100 * time.Millisecond)

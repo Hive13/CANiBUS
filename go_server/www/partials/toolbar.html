@@ -1,3 +1,20 @@
-<ul id=toolbarUL>
-  <li id=startBtn><button ng-click="StartSniffer({{id}})">Start</button></li>
+<div class="navbar navbar-inverse">
+<div class="navbar-inner">
+<div class="nav-collapse collapse">
+<ul id=toolbarUL class="Nav">
+  <li ng-if="!started" id=startBtn>
+    <a ng-click="StartSniffer({{id}})">Start</a>
+  </li>
+  <li ng-if="started" id=stopBtn>
+    <a ng-click="StopSniffer({{id}})">Stop</a>
+  </li>
+  <li ng-if="viewType=='SeqView'" id=seqView>
+    <a ng-click="setArbView()">Arb View</a>
+  </li>
+  <li ng-if="viewType=='ArbView'" id=arbView>
+    <a ng-click="setSeqView()">Seq View</a>
+  </li>
 </ul>
+</div>
+</div>
+</div>

@@ -1,27 +1,38 @@
 <TABLE id="packetsTbl">
   <tr id=packetHeaderRow>
-    <th id=first class="packetHdr">Src</th>
-    <th class="packetHdr">ArbID</th>
-    <th class="packetHdr">B1</th>
-    <th class="packetHdr">B2</th>
-    <th class="packetHdr">B3</th>
-    <th class="packetHdr">B4</th>
-    <th class="packetHdr">B5</th>
-    <th class="packetHdr">B6</th>
-    <th class="packetHdr">B7</th>
-    <th class="packetHdr">Ext</th>
+    <th id=first class="packetHdr packetSrc">Src</th>
+    <th class="packetHdr packetArbID" ng-click="predicate='ArbID';reverse=!reverse">ArbID</th>
+    <th class="packetHdr packetNetwork" ng-click="predicate='Network';reverse=false">Network</th>
+    <th class="packetHdr packetB1">B1</th>
+    <th class="packetHdr packetB2">B2</th>
+    <th class="packetHdr packetB3">B3</th>
+    <th class="packetHdr packetB4">B4</th>
+    <th class="packetHdr packetB5">B5</th>
+    <th class="packetHdr packetB6">B6</th>
+    <th class="packetHdr packetB7">B7</th>
+    <th class="packetHdr packetB8">B8</th>
     <th id=last class="packetHdr">Notes</th>
   </tr>
-  <tr ng-class-odd="'packetRowOdd'" ng-class-even="'paccketRowEven'" ng-repeat="packet in packets" >
+  <tr ng-class-odd="'packetRowOdd'" ng-class-even="'paccketRowEven'" ng-repeat="packet in packets | orderBy:predicate:reverse" >
     <td class="packetSrc">{{packet.Src}}</td>
     <td class="packetArbID">{{packet.ArbID}}</td>
-    <td class="packetB1">{{packet.B1}}</td>
-    <td class="packetB2">{{packet.B2}}</td>
-    <td class="packetB3">{{packet.B3}}</td>
-    <td class="packetB4">{{packet.B4}}</td>
-    <td class="packetB5">{{packet.B5}}</td>
-    <td class="packetB6">{{packet.B6}}</td>
-    <td class="packetB7">{{packet.B7}}</td>
+    <td class="packetNetwork">{{packet.Network}}</td>
+    <td ng-if="packet.B1changed" class="packetB1 byteChange">{{packet.B1}}</td>
+    <td ng-if="!packet.B1changed" class="packetB1">{{packet.B1}}</td>
+    <td ng-if="packet.B2changed" class="packetB2 byteChange">{{packet.B2}}</td>
+    <td ng-if="!packet.B2changed" class="packetB2">{{packet.B2}}</td>
+    <td ng-if="packet.B3changed" class="packetB3 byteChange">{{packet.B3}}</td>
+    <td ng-if="!packet.B3changed" class="packetB3">{{packet.B3}}</td>
+    <td ng-if="packet.B4changed" class="packetB4 byteChange">{{packet.B4}}</td>
+    <td ng-if="!packet.B4changed" class="packetB4">{{packet.B4}}</td>
+    <td ng-if="packet.B5changed" class="packetB5 byteChange">{{packet.B5}}</td>
+    <td ng-if="!packet.B5changed" class="packetB5">{{packet.B5}}</td>
+    <td ng-if="packet.B6changed" class="packetB6 byteChange">{{packet.B6}}</td>
+    <td ng-if="!packet.B6changed" class="packetB6">{{packet.B6}}</td>
+    <td ng-if="packet.B7changed" class="packetB7 byteChange">{{packet.B7}}</td>
+    <td ng-if="!packet.B7changed" class="packetB7">{{packet.B7}}</td>
+    <td ng-if="packet.B8changed" class="packetB8 byteChange">{{packet.B8}}</td>
+    <td ng-if="!packet.B8changed" class="packetB8">{{packet.B8}}</td>
     <td class="packetNotes">{{packet.Notes}}</td>
   </tr>
 </TABLE>

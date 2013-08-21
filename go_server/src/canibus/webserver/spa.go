@@ -48,6 +48,39 @@ func partialLobbyHandler(w http.ResponseWriter, r *http.Request) {
         fmt.Fprintf(w, "%s", p.Body)
 }
 
+func haxStopHandler(w http.ResponseWriter, r *http.Request) {
+	logger.Log("Stop Sniffer")
+	auth_err := checkAuth(w, r)
+	if auth_err != nil { return }
+	vars := mux.Vars(r)
+	canId, canId_err := strconv.Atoi(vars["id"])
+	if canId_err != nil {
+		http.Error(w, canId_err.Error(), http.StatusNotFound)
+		return
+	}
+	dev, dev_err := core.GetDeviceById(canId)
+	if dev_err != nil {
+		http.Error(w, dev_err.Error(), http.StatusNotFound)
+		return
+	}
+	session, _ := store.Get(r, "canibus")
+	userName := session.Values["user"].(string)
+	user, _ := core.GetUserByName(userName)
+
+	hax := dev.GetHackSession()
+	if hax == nil {
+		http.Error(w, "Session not configured", http.StatusNotFound)
+		return
+	}
+	if !hax.IsActiveUser(user) {
+		http.Error(w, "You are not a part of this hacksession", http.StatusNotFound)
+		return
+	}
+	dev.StopSniffing()
+        fmt.Fprintf(w, "%s", "OK")
+}
+
+
 func haxStartHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Log("Start Sniffer")
 	auth_err := checkAuth(w, r)
@@ -249,6 +282,7 @@ func StartSPAWebListener(root string, ip string, port string) error {
 	r.HandleFunc("/candevice/{id}/info", candeviceInfoHandler)
 	r.HandleFunc("/hax/{id}/packets", haxPacketsHandler)
 	r.HandleFunc("/hax/{id}/start", haxStartHandler)
+	r.HandleFunc("/hax/{id}/stop", haxStopHandler)
 	r.HandleFunc("/candevices", candevicesHandler)
 	r.HandleFunc("/lobby/AddSimulator", addSimHandler)
 
