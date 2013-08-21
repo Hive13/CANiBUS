@@ -111,8 +111,11 @@ func haxStartHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !hax.IsActiveUser(user) {
+		/* No reason for this, just add them
 		http.Error(w, "You are not a part of this hacksession", http.StatusNotFound)
 		return
+		*/
+		hax.AddUser(user)
 	}
 	if hax.GetStateValue() != hacksession.STATE_SNIFF {
 		hax.SetState(hacksession.STATE_SNIFF)
@@ -122,7 +125,6 @@ func haxStartHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func haxPacketsHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Log("Sniffer hax")
 	auth_err := checkAuth(w, r)
 	if auth_err != nil {
 		return
@@ -200,10 +202,34 @@ func configCanHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func joinHaxHandler(w http.ResponseWriter, r *http.Request) {
-	//vars := mux.Vars(r)
-	//canId := vars["id"]
-	// TODO: Check HackSession state and either config or sniff
-	p, err := loadPage("partials/config.html")
+	auth_err := checkAuth(w, r)
+	if auth_err != nil {
+		return
+	}
+	vars := mux.Vars(r)
+	canId, canId_err := strconv.Atoi(vars["id"])
+	if canId_err != nil {
+		http.Error(w, canId_err.Error(), http.StatusNotFound)
+		return
+	}
+	dev, dev_err := core.GetDeviceById(canId)
+	if dev_err != nil {
+		http.Error(w, dev_err.Error(), http.StatusNotFound)
+		return
+	}
+	session, _ := store.Get(r, "canibus")
+	userName := session.Values["user"].(string)
+	user, _ := core.GetUserByName(userName)
+
+	hax := dev.GetHackSession()
+	hax.AddUser(user)
+	var p *Page
+	var err error
+	if hax.GetStateValue() == hacksession.STATE_SNIFF {
+		p, err = loadPage("partials/sniff.html")
+	} else {
+		p, err = loadPage("partials/config.html")
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

@@ -49,16 +49,28 @@ controllers.loginController = function($scope, $http, $location) {
 
 };
 
-controllers.lobbyController = function($scope, $http, $timeout) {
+controllers.lobbyController = function($scope, $location, $http, $timeout) {
 
   $scope.devices = []
-  $scope.devicePromise;
+  var devicePromise;
 
   $scope.$on("$destroy", function() {
-    if($scope.devicePromise) {
-      $timeout.cancel($scope.devicePromise);
+    if(devicePromise) {
+      $timeout.cancel(devicePromise);
     }
   });
+
+  $scope.config = function(id) {
+    if(devicePromise) {
+      $timeout.cancel(devicePromise);
+    }
+  }
+
+  $scope.join = function(id) {
+    if(devicePromise) {
+      $timeout.cancel(devicePromise);
+    }
+  }
 
   function DevInList(dev) {
     for (var i = 0; i < $scope.devices.length; i++) {
@@ -86,7 +98,7 @@ controllers.lobbyController = function($scope, $http, $timeout) {
         }
       }
     });
-    $scope.devicePromise = $timeout(function() { $scope.fetchDevices(); }, 3000);
+    devicePromise = $timeout(function() { $scope.fetchDevices(); }, 3000);
   }
 
   $scope.fetchDevices = function() {
@@ -102,7 +114,6 @@ controllers.lobbyController = function($scope, $http, $timeout) {
   }
 
   $scope.fetchDevices();
-  $scope.devicePromise = $timeout(function() { $scope.fetchDevices(); }, 3000);
 };
 
 controllers.configController = function($scope, $http, $location, $routeParams) {
@@ -134,10 +145,6 @@ controllers.haxController = function($scope, $http, $timeout, $routeParams) {
   $scope.viewType = "ArbView";
   var snifferPromise;
   var pollTimer = 500;
-
-  if($scope.devicePromise) {
-    $timeout.cancel($scope.devicePromise);
-  }
 
   function PacketArbIDInList(pkt) {
     for (var i = 0; i < $scope.packets.length; i++) {
