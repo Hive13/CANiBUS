@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	DEFAULT_IP   = "0.0.0.0"
-	DEFAULT_PORT = "1234"
-        DEFAULT_WEBPORT = "2515"
-	DEFAULT_WWW_ROOT = "www"
+	DEFAULT_IP          = "0.0.0.0"
+	DEFAULT_PORT        = "1234"
+	DEFAULT_WEBPORT     = "2515"
+	DEFAULT_WWW_ROOT    = "www"
 	DEFAULT_CONFIG_FILE = "config.json"
 )
 

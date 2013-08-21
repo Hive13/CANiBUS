@@ -22,13 +22,13 @@ type User interface {
 }
 
 type CanDevice interface {
-        Init() bool
-        DeviceType() string
-        DeviceDesc() string
-        GetId() int
-        SetId(int)
-        GetHackSession() HackSession
-        SetHackSession(HackSession)
+	Init() bool
+	DeviceType() string
+	DeviceDesc() string
+	GetId() int
+	SetId(int)
+	GetHackSession() HackSession
+	SetHackSession(HackSession)
 	GetYear() string
 	GetMake() string
 	GetModel() string
@@ -52,32 +52,31 @@ type HackSession interface {
 }
 
 type CanData struct {
-	Src string	// Where packet originated
-	SeqNo int
-	AbsTime string
-	RelTime string
-	Status string
-	Error string
+	Src      string // Where packet originated
+	SeqNo    int
+	AbsTime  string
+	RelTime  string
+	Status   string
+	Error    string
 	Transmit string
-	Desc string
-	Network string
-	Node string
-	ArbID string
-	Remote bool
+	Desc     string
+	Network  string
+	Node     string
+	ArbID    string
+	Remote   bool
 	Extended bool
-	B1 uint8
-	B2 uint8
-	B3 uint8
-	B4 uint8
-	B5 uint8
-	B6 uint8
-	B7 uint8
-	B8 uint8
-	Value string
-	Trigger string
-	Signals string
+	B1       uint8
+	B2       uint8
+	B3       uint8
+	B4       uint8
+	B5       uint8
+	B6       uint8
+	B7       uint8
+	B8       uint8
+	Value    string
+	Trigger  string
+	Signals  string
 }
-
 
 type CanibusAPIVersion struct {
 	Major int
@@ -102,7 +101,7 @@ type Cmd struct {
 // Generic Error struct to send clients
 type Err struct {
 	Type string
-	Msg string
+	Msg  string
 }
 
 type Client struct {
@@ -128,15 +127,15 @@ func InitAPI() {
 }
 
 func ProcessLogin(cmd *Cmd) error {
-        switch len(cmd.Arg) {
-        case 1:
-                if cmd.Arg[0] == "" {
-                        return logger.Err("Login: Invalid Name")
-                }
+	switch len(cmd.Arg) {
+	case 1:
+		if cmd.Arg[0] == "" {
+			return logger.Err("Login: Invalid Name")
+		}
 		// Currently no real checks
 		return nil
-        default:
-                return logger.Err("Login: Wrong number of arguments needed to login")
-        }
+	default:
+		return logger.Err("Login: Wrong number of arguments needed to login")
+	}
 	return logger.Err("Internal error for ProcessLogin")
 }

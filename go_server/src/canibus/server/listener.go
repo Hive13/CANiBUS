@@ -14,7 +14,7 @@ import (
 
 type ServerData struct {
 	ClientList *list.List
-	LastId int
+	LastId     int
 }
 
 // Global Data

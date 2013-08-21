@@ -25,9 +25,8 @@ func loadPage(filename string) (*Page, error) {
 
 func loadTemplate(filename string) (*template.Template, error) {
 	t, err := template.ParseFiles(path.Join(web_root, filename))
-	if err !=  nil {
+	if err != nil {
 		return nil, err
 	}
 	return t, nil
 }
-

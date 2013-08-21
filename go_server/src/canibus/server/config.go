@@ -5,14 +5,14 @@ import (
 	"canibus/candevice"
 	"canibus/logger"
 	"encoding/json"
-	"os"
-	"io"
 	"fmt"
+	"io"
+	"os"
 )
 
 type ConfigElement struct {
-	DeviceType string
-	DeviceFile string
+	DeviceType   string
+	DeviceFile   string
 	DeviceSerial string
 }
 
@@ -62,7 +62,7 @@ func (c *Config) LoadConfig(conf string) {
 func (c *Config) AppendDriver(drv api.CanDevice) int {
 	var next_id int
 	next_id = 0
-	for i:= range c.Drivers {
+	for i := range c.Drivers {
 		if next_id <= c.Drivers[i].GetId() {
 			next_id = c.Drivers[i].GetId()
 		}

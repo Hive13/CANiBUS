@@ -1,13 +1,11 @@
 package canibususer
 
-import (
-
-)
+import ()
 
 type CanibusUser struct {
-	Name string
+	Name     string
 	DeviceId int
-	lastIdx int // Index values for packet sequences
+	lastIdx  int // Index values for packet sequences
 }
 
 func (u *CanibusUser) GetName() string {

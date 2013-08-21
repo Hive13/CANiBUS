@@ -4,24 +4,24 @@ import (
 	"canibus/api"
 	"canibus/logger"
 	"canibus/obd"
-	"github.com/tarm/goserial"
 	"encoding/hex"
-	"io"
 	"fmt"
+	"github.com/tarm/goserial"
+	"io"
 )
 
 type Elm327 struct {
-	SerialPort string
-	Serial io.ReadWriteCloser
-	Type string
-	Desc string
-	VIN string
-	id int
-	Year string
-	Make string
+	SerialPort        string
+	Serial            io.ReadWriteCloser
+	Type              string
+	Desc              string
+	VIN               string
+	id                int
+	Year              string
+	Make              string
 	VehicleAttributes obd.VehicleAttributes
-	HackSession api.HackSession
-	packetIdx int
+	HackSession       api.HackSession
+	packetIdx         int
 }
 
 func (e *Elm327) SetSerial(port string) {
@@ -51,7 +51,7 @@ func (e *Elm327) Init() bool {
 		return false
 	}
 	e.Serial = s
-	resp, _ := e.Readln()  // Clear buffer
+	resp, _ := e.Readln() // Clear buffer
 	resp, err = e.SendCmd("ATZ")
 	e.Type = string(resp[1:]) // Skip first \r
 	resp, _ = e.SendCmd("ATE0")
@@ -93,17 +93,17 @@ func (e *Elm327) GetVIN() string {
 		return e.VIN
 	}
 	resp, _ := e.SendCmd("09 02")
-/*
-	respLines := e.toStrings(resp)
-	for i := range respLines {
-		fmt.Println("VIN: ", respLines[i])
-	}
-	for i := range resp {
-		fmt.Print("[", i, "]", resp[i], " ")
-	}
-	fmt.Println("")
-	vinSize := respLines[0]
-*/
+	/*
+		respLines := e.toStrings(resp)
+		for i := range respLines {
+			fmt.Println("VIN: ", respLines[i])
+		}
+		for i := range resp {
+			fmt.Print("[", i, "]", resp[i], " ")
+		}
+		fmt.Println("")
+		vinSize := respLines[0]
+	*/
 	// TODO do not hard code this :)
 	vin := make([]byte, 34)
 	vin[0] = resp[17]

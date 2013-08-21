@@ -1,17 +1,17 @@
 package candevice
 
 import (
-	"github.com/tarm/goserial"
 	"canibus/logger"
 	"fmt"
+	"github.com/tarm/goserial"
 	"io"
 )
 
 type GoodThopter struct {
 	SerialPort string
-	Serial io.ReadWriteCloser
-	App uint8
-	Verb uint8
+	Serial     io.ReadWriteCloser
+	App        uint8
+	Verb       uint8
 }
 
 func (mcp *GoodThopter) SetSerial(port string) {

@@ -1,57 +1,61 @@
 package webserver
 
 import (
-	"canibus/core"
 	"canibus/candevice"
+	"canibus/core"
 	"canibus/hacksession"
 	"canibus/logger"
-	"github.com/gorilla/mux"
-	"fmt"
-	"strconv"
-	"net/http"
 	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
+	"net/http"
+	"strconv"
 )
 
 type CanDeviceJSON struct {
-	Id int
-	DeviceType string
-	DeviceDesc string
+	Id          int
+	DeviceType  string
+	DeviceDesc  string
 	HackSession string
-	Year string
-	Make string
-	Model string
+	Year        string
+	Make        string
+	Model       string
 }
 
 type ConfigJSSON struct {
-	Id int
+	Id         int
 	DeviceType string
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-        p, err := loadPage("index-spa.html")
-        if err != nil {
-                http.Error(w, err.Error(), http.StatusNotFound)
-                return
-        }
-        fmt.Fprintf(w, "%s", p.Body)
+	p, err := loadPage("index-spa.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	fmt.Fprintf(w, "%s", p.Body)
 }
 
 func partialLobbyHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Log("Lobby checking auth...")
 	auth_err := checkAuth(w, r)
-	if auth_err != nil { return }
-        p, err := loadPage("partials/lobby.html")
-        if err != nil {
-                http.Error(w, err.Error(), http.StatusNotFound)
-                return
-        }
-        fmt.Fprintf(w, "%s", p.Body)
+	if auth_err != nil {
+		return
+	}
+	p, err := loadPage("partials/lobby.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	fmt.Fprintf(w, "%s", p.Body)
 }
 
 func haxStopHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Log("Stop Sniffer")
 	auth_err := checkAuth(w, r)
-	if auth_err != nil { return }
+	if auth_err != nil {
+		return
+	}
 	vars := mux.Vars(r)
 	canId, canId_err := strconv.Atoi(vars["id"])
 	if canId_err != nil {
@@ -77,14 +81,15 @@ func haxStopHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dev.StopSniffing()
-        fmt.Fprintf(w, "%s", "OK")
+	fmt.Fprintf(w, "%s", "OK")
 }
-
 
 func haxStartHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Log("Start Sniffer")
 	auth_err := checkAuth(w, r)
-	if auth_err != nil { return }
+	if auth_err != nil {
+		return
+	}
 	vars := mux.Vars(r)
 	canId, canId_err := strconv.Atoi(vars["id"])
 	if canId_err != nil {
@@ -113,13 +118,15 @@ func haxStartHandler(w http.ResponseWriter, r *http.Request) {
 		hax.SetState(hacksession.STATE_SNIFF)
 		dev.StartSniffing()
 	}
-        fmt.Fprintf(w, "%s", "OK")
+	fmt.Fprintf(w, "%s", "OK")
 }
 
 func haxPacketsHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Log("Sniffer hax")
 	auth_err := checkAuth(w, r)
-	if auth_err != nil { return }
+	if auth_err != nil {
+		return
+	}
 	vars := mux.Vars(r)
 	canId, canId_err := strconv.Atoi(vars["id"])
 	if canId_err != nil {
@@ -157,7 +164,9 @@ func haxPacketsHandler(w http.ResponseWriter, r *http.Request) {
 func configCanHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Log("Config CAN Device, checking auth...")
 	auth_err := checkAuth(w, r)
-	if auth_err != nil { return }
+	if auth_err != nil {
+		return
+	}
 	vars := mux.Vars(r)
 	canId, canId_err := strconv.Atoi(vars["id"])
 	if canId_err != nil {
@@ -182,24 +191,24 @@ func configCanHandler(w http.ResponseWriter, r *http.Request) {
 		hacks.AddUser(user)
 	}
 
-        p, err := loadPage("partials/config.html")
-        if err != nil {
-                http.Error(w, err.Error(), http.StatusNotFound)
-                return
-        }
-        fmt.Fprintf(w, "%s", p.Body)
+	p, err := loadPage("partials/config.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	fmt.Fprintf(w, "%s", p.Body)
 }
 
 func joinHaxHandler(w http.ResponseWriter, r *http.Request) {
 	//vars := mux.Vars(r)
 	//canId := vars["id"]
 	// TODO: Check HackSession state and either config or sniff
-        p, err := loadPage("partials/config.html")
-        if err != nil {
-                http.Error(w, err.Error(), http.StatusNotFound)
-                return
-        }
-        fmt.Fprintf(w, "%s", p.Body)
+	p, err := loadPage("partials/config.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	fmt.Fprintf(w, "%s", p.Body)
 }
 
 func addSimHandler(w http.ResponseWriter, r *http.Request) {
@@ -207,7 +216,7 @@ func addSimHandler(w http.ResponseWriter, r *http.Request) {
 	dev := &candevice.Simulator{}
 	newId := config.AppendDriver(dev)
 	data := CanDeviceJSON{}
-        data.Id = newId
+	data.Id = newId
 	data.DeviceType = dev.DeviceType()
 	data.HackSession = "Idle"
 	j, err := json.Marshal(data)
@@ -231,7 +240,7 @@ func candeviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := CanDeviceJSON{}
-        data.Id = dev.GetId()
+	data.Id = dev.GetId()
 	data.DeviceType = dev.DeviceType()
 	data.DeviceDesc = dev.DeviceDesc()
 	j, err := json.Marshal(data)
@@ -286,18 +295,18 @@ func StartSPAWebListener(root string, ip string, port string) error {
 	r.HandleFunc("/candevices", candevicesHandler)
 	r.HandleFunc("/lobby/AddSimulator", addSimHandler)
 
-	http.Handle("/partials/",http.FileServer(http.Dir(root)))
-	http.Handle("/js/",http.FileServer(http.Dir(root)))
+	http.Handle("/partials/", http.FileServer(http.Dir(root)))
+	http.Handle("/js/", http.FileServer(http.Dir(root)))
 	http.Handle("/css/", http.FileServer(http.Dir(root)))
 	http.Handle("/fonts/", http.FileServer(http.Dir(root)))
 	http.Handle("/images/", http.FileServer(http.Dir(root)))
 	http.Handle("/bootstrap/", http.FileServer(http.Dir(root)))
 	http.Handle("/", r)
-        remote := ip + ":" + port
-        logger.Log("Starting CANiBUS Web server on " + remote)
-        err := http.ListenAndServe(remote, nil)
-        if err != nil {
-                return logger.Err("Could not bind web to port: " + err.Error())
-        }
-        return nil
+	remote := ip + ":" + port
+	logger.Log("Starting CANiBUS Web server on " + remote)
+	err := http.ListenAndServe(remote, nil)
+	if err != nil {
+		return logger.Err("Could not bind web to port: " + err.Error())
+	}
+	return nil
 }

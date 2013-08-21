@@ -12,13 +12,13 @@ const (
 )
 
 type HackSession struct {
-	Users []api.User
-	State int
+	Users    []api.User
+	State    int
 	DeviceId int
-	Device api.CanDevice
+	Device   api.CanDevice
 }
 
-func (s *HackSession)GetState() string {
+func (s *HackSession) GetState() string {
 	if s.State == STATE_CONFIG {
 		return "Config..."
 	} else if s.State == STATE_SNIFF {
@@ -27,36 +27,36 @@ func (s *HackSession)GetState() string {
 	return "Idle"
 }
 
-func (s *HackSession)GetStateValue() int {
+func (s *HackSession) GetStateValue() int {
 	return s.State
 }
 
-func (s *HackSession)SetState(state int) {
+func (s *HackSession) SetState(state int) {
 	s.State = state
 }
 
-func (s *HackSession)GetDeviceId() int {
+func (s *HackSession) GetDeviceId() int {
 	return s.DeviceId
 }
 
-func (s *HackSession)SetDeviceId(id int) {
+func (s *HackSession) SetDeviceId(id int) {
 	s.DeviceId = id
 }
 
-func (s *HackSession)SetDevice(dev api.CanDevice) {
+func (s *HackSession) SetDevice(dev api.CanDevice) {
 	s.Device = dev
 	s.DeviceId = dev.GetId()
 }
 
-func (s *HackSession)NumOfUsers() int {
+func (s *HackSession) NumOfUsers() int {
 	return len(s.Users)
 }
 
-func (s *HackSession)AddUser(user api.User) {
+func (s *HackSession) AddUser(user api.User) {
 	s.Users = append(s.Users, user)
 }
 
-func (s *HackSession)RemoveUser(user api.User) {
+func (s *HackSession) RemoveUser(user api.User) {
 	var newUsers []api.User
 	for i := range s.Users {
 		if s.Users[i].GetName() != user.GetName() {
@@ -66,7 +66,7 @@ func (s *HackSession)RemoveUser(user api.User) {
 	s.Users = newUsers
 }
 
-func (s *HackSession)IsActiveUser(user api.User) bool {
+func (s *HackSession) IsActiveUser(user api.User) bool {
 	for i := range s.Users {
 		if s.Users[i].GetName() == user.GetName() {
 			return true
@@ -81,7 +81,7 @@ func (s *HackSession) GetPackets(user api.User) []api.CanData {
 	if s.Device == nil {
 		return pkts
 	}
-	if user.LastIdx() == 0 {	 // First time sniffing
+	if user.LastIdx() == 0 { // First time sniffing
 		user.SetLastIdx(s.Device.GetPacketIdx())
 	}
 	pkts, idx = s.Device.GetPacketsFrom(user.LastIdx())

@@ -5,21 +5,21 @@ package webserver
 
 import (
 	"canibus/api"
-	"canibus/core"
-	"canibus/logger"
 	"canibus/canibususer"
+	"canibus/core"
 	"canibus/hacksession"
+	"canibus/logger"
 	"fmt"
-	"strconv"
-	"net/http"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"net/http"
+	"strconv"
 	//"code.google.com/p/go.net/websocket"
 )
 
 type LobbyTemplate struct {
-	Host string
-	Config api.Configer
+	Host       string
+	Config     api.Configer
 	NumOfUsers int
 }
 
@@ -108,7 +108,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func lobbyHandler(w http.ResponseWriter, r *http.Request) {
 	auth_err := checkAuth(w, r)
-	if auth_err != nil { return }
+	if auth_err != nil {
+		return
+	}
 	t, err := loadTemplate("lobby.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -132,7 +134,9 @@ func lobbyHandler(w http.ResponseWriter, r *http.Request) {
 
 func configHandler(w http.ResponseWriter, r *http.Request) {
 	auth_err := checkAuth(w, r)
-	if auth_err != nil { return }
+	if auth_err != nil {
+		return
+	}
 	t, err := loadTemplate("config.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -162,10 +166,10 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	data := ConfigTemplate{}
 	data.Device = dev
-        exec_err := t.Execute(w, data)
-        if exec_err != nil {
-                fmt.Println("Config Error: ", exec_err)
-        }
+	exec_err := t.Execute(w, data)
+	if exec_err != nil {
+		fmt.Println("Config Error: ", exec_err)
+	}
 }
 
 func hacksessionHandler(w http.ResponseWriter, r *http.Request) {
@@ -257,7 +261,7 @@ func StartWebListener(root string, ip string, port string) error {
 	http.HandleFunc("/config", configHandler)
 	http.HandleFunc("/hacksession", hacksessionHandler)
 	//http.Handle("/chatLobby", websocket.Handler(chatLobbyHandler))
-        remote := ip + ":" + port
+	remote := ip + ":" + port
 	logger.Log("Starting CANiBUS Web server on " + remote)
 	err := http.ListenAndServe(remote, nil)
 	if err != nil {
@@ -265,4 +269,3 @@ func StartWebListener(root string, ip string, port string) error {
 	}
 	return nil
 }
-

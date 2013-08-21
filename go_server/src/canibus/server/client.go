@@ -27,8 +27,8 @@ type Client struct {
 	Conn     net.Conn
 	Quit     chan bool
 	Lang     int
-	State	int
-	Id	int
+	State    int
+	Id       int
 }
 
 // Closes the clients connection
@@ -106,7 +106,7 @@ func (c *Client) ProcessIncoming(msg string) (*api.Cmd, error) {
 }
 
 func (c *Client) sendError(t string, msg string) {
-	err := &api.Err{ t, msg }
+	err := &api.Err{t, msg}
 	c.ProcessOutgoing(err)
 }
 
@@ -115,7 +115,7 @@ func (c *Client) ProcessLogin(cmd *api.Cmd) {
 	switch len(cmd.Arg) {
 	case 1:
 		if cmd.Arg[0] == "" {
-			c.sendError("Login","Invalid Name")
+			c.sendError("Login", "Invalid Name")
 			return
 		}
 		c.Name = cmd.Arg[0] // Do we want to make this uniq?
@@ -144,5 +144,3 @@ func (c *Client) ProcessCommand(cmd string) {
 		logger.Log("Unkown action:" + aCmd.Action)
 	}
 }
-
-

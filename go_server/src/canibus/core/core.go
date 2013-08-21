@@ -8,7 +8,7 @@ import (
 
 type CoreData struct {
 	CConfig api.Configer
-	Users []api.User
+	Users   []api.User
 }
 
 var CData CoreData
@@ -48,7 +48,7 @@ func GetUserByName(userName string) (api.User, error) {
 		return nil, logger.Err("No registered users")
 	}
 	for i := range CData.Users {
-		if (CData.Users[i].GetName() == userName) {
+		if CData.Users[i].GetName() == userName {
 			return CData.Users[i], nil
 		}
 	}

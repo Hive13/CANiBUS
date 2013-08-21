@@ -5,24 +5,24 @@ import (
 	"canibus/logger"
 	"encoding/json"
 	"io/ioutil"
-//	"strconv"
+	//	"strconv"
 	"time"
 )
 
 const (
-	MAX_BUFFER = 10000  // Packets in buffer
+	MAX_BUFFER  = 10000 // Packets in buffer
 	MAX_APPENDS = 1000  // Max packets returned at one time
 )
 
 type Simulator struct {
-	PacketFile string
-	SimPackets []api.CanData
-	Packets [MAX_BUFFER]api.CanData
-	HackSession api.HackSession
-	id int
+	PacketFile   string
+	SimPackets   []api.CanData
+	Packets      [MAX_BUFFER]api.CanData
+	HackSession  api.HackSession
+	id           int
 	sniffEnabled bool
-	packetIdx int
-	seqNo int
+	packetIdx    int
+	seqNo        int
 }
 
 func (sim *Simulator) SetPacketFile(packets string) {
@@ -106,6 +106,7 @@ func (sim *Simulator) addPacket(simPkt api.CanData) {
 	pkt := api.CanData{}
 	pkt.SeqNo = sim.seqNo
 	sim.seqNo += 1
+	pkt.Src = simPkt.Src
 	pkt.AbsTime = time.Now().Format("10:00:00pm (EST)")
 	pkt.RelTime = simPkt.RelTime
 	pkt.Status = simPkt.Status
@@ -146,14 +147,14 @@ func (sim *Simulator) processPackets() {
 			simIdx = 0
 		}
 		/*
-		pktRelTime, cerr := strconv.ParseFloat(sim.SimPackets[simIdx].RelTime, 32)
-		if cerr == nil {
-			if sim.SimPackets[simIdx].SeqNo != 0 && relDiff > pktRelTime {
-				relDiff -= pktRelTime
-				sim.addPacket(sim.SimPackets[simIdx])
-				simIdx += 1
+			pktRelTime, cerr := strconv.ParseFloat(sim.SimPackets[simIdx].RelTime, 32)
+			if cerr == nil {
+				if sim.SimPackets[simIdx].SeqNo != 0 && relDiff > pktRelTime {
+					relDiff -= pktRelTime
+					sim.addPacket(sim.SimPackets[simIdx])
+					simIdx += 1
+				}
 			}
-		}
 		*/
 		// FIXME Just temp code to test interface
 		sim.SimPackets[simIdx].Src = "Sim"
@@ -169,7 +170,7 @@ func (sim *Simulator) GetPacketsFrom(idx int) ([]api.CanData, int) {
 	done = false
 	appends := 0
 	for done != true {
-		if(idx > MAX_BUFFER || idx < 0) {
+		if idx > MAX_BUFFER || idx < 0 {
 			idx = 0
 		}
 		if idx == sim.packetIdx {
@@ -178,7 +179,7 @@ func (sim *Simulator) GetPacketsFrom(idx int) ([]api.CanData, int) {
 		pkts = append(pkts, sim.Packets[idx])
 		idx += 1
 		appends += 1
-		if (appends > MAX_APPENDS) {
+		if appends > MAX_APPENDS {
 			done = true
 		}
 	}
