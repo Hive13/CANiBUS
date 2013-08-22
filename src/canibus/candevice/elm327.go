@@ -263,3 +263,8 @@ func (e *Elm327) GetPacketsFrom(idx int) ([]api.CanData, int) {
 func (e *Elm327) GetPacketIdx() int {
 	return e.packetIdx
 }
+
+func (e *Elm327) InjectPacket(pkt api.CanData) error {
+	return nil
+}
+

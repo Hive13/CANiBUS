@@ -136,11 +136,14 @@ controllers.configController = function($scope, $http, $location, $routeParams) 
 
 };
 
-controllers.haxController = function($scope, $http, $timeout, $routeParams) {
+controllers.haxController = function($scope, $filter, $http, $timeout, $routeParams) {
   $scope.packets = [];
   $scope.id = $routeParams.id;
   $scope.predicate = "ArbID";
   $scope.reverse = false;
+  $scope.transmitCount = 0;
+  $scope.transmitErr = "";
+  $scope.tx = {ArbId: '', Network: '', B1: '', B2: '', B3: '', B4: '', B5: '', B6: '', B7: '', B8: ''};
 
   $scope.viewType = "ArbView";
   var snifferPromise;
@@ -259,10 +262,44 @@ controllers.haxController = function($scope, $http, $timeout, $routeParams) {
 
   $scope.setArbView = function() {
     $scope.viewType='ArbView';
+    $scope.packets = [];
   }
 
   $scope.setSeqView = function() {
     $scope.viewType='SeqView';
+    $scope.packets = [];
+  }
+
+  $scope.transmit = function(id) {
+    if($scope.tx == "" || $scope.tx.ArbId == "") {
+      $scope.transmitErr = "You must specify an ArbId";
+      return;
+    }
+    pkt = "[" + JSON.stringify($scope.tx) + "]";
+    $http({
+      url: "/hax/"+id+"/transmit",
+      method: "POST",
+      data: "tx=" + pkt,
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).success(function (data, status) {
+         $scope.transmitCount += 1;
+         $scope.transmitErr == "";
+       }).error(function (data, status) {
+         $scope.transmitErr == "Could not transmit packet";
+       });
+  }
+
+  $scope.copyPacket = function(pkt) {
+    this.tx.ArbId = pkt.ArbID;
+    $scope.tx.Network = pkt.Network;
+    $scope.tx.B1 = pkt.B1;
+    $scope.tx.B2 = pkt.B2;
+    $scope.tx.B3 = pkt.B3;
+    $scope.tx.B4 = pkt.B4;
+    $scope.tx.B5 = pkt.B5;
+    $scope.tx.B6 = pkt.B6;
+    $scope.tx.B7 = pkt.B7;
+    $scope.tx.B8 = pkt.B8;
   }
 
   $scope.fetchPackets = function(id) {

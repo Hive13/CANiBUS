@@ -1,0 +1,58 @@
+<FORM name="transmitFrm">
+<h2>Transmit</h2>
+<table id=trasmitTbl>
+<tr id=transmitHdr>
+  <th>ArbId</th>
+  <th>Network</th>
+  <th>B1</th>
+  <th>B2</th>
+  <th>B3</th>
+  <th>B4</th>
+  <th>B5</th>
+  <th>B6</th>
+  <th>B7</th>
+  <th>B8</th>
+  <th></th>
+  <th></th>
+</tr>
+<tr id=transmit>
+  <td id=ArbTx>
+    <input type=text ng-model="tx.ArbId" id=ArbTxTxt required>
+  </td>
+  <td id=NetworkTx>
+    <input type=text ng-model="tx.Network" id=NetworkTxTxt>
+  </td>
+  <td id=B1Tx>
+    <input type=text ng-model="tx.B1" id=BTxt>
+  </td>
+  <td id=B2Tx>
+    <input type=text ng-model="tx.B2" id=BTxt>
+  </td>
+  <td id=B3Tx>
+    <input type=text ng-model="tx.B3" id=BTxt>
+  </td>
+  <td id=B4Tx>
+    <input type=text ng-model="tx.B4" id=BTxt>
+  </td>
+  <td id=B5Tx>
+    <input type=text ng-model="tx.B5" id=BTxt>
+  </td>
+  <td id=B6Tx>
+    <input type=text ng-model="tx.B6" id=BTxt>
+  </td>
+  <td id=B7Tx>
+    <input type=text ng-model="tx.B7" id=BTxt>
+  </td>
+  <td id=B8Tx>
+    <input type=text ng-model="tx.B8" id=BTxt>
+  </td>
+  <td id=TrasmitBtn>
+    <a ng-click="transmit({{id}})" class="btn btn-primary">Transmit</a>
+  </td>
+  <td id=TrasnmitMsg>
+    <span ng-show="transmitCount > 0"><ng-pluralize count="transmitCount" when="{'1': 'Packet Sent','other': '{} Packets sent'}"</span>
+    <span ng-show="transmitErr">{{transmitErr}}</span>
+  </td>
+</tr>
+</table>
+</FORM>

@@ -3,6 +3,7 @@ package api
 
 import (
 	"canibus/logger"
+	"strconv"
 	"fmt"
 )
 
@@ -36,6 +37,7 @@ type CanDevice interface {
 	GetPacketIdx() int
 	StartSniffing()
 	StopSniffing()
+	InjectPacket(CanData) error
 }
 
 type HackSession interface {
@@ -49,6 +51,20 @@ type HackSession interface {
 	RemoveUser(User)
 	IsActiveUser(User) bool
 	GetPackets(User) []CanData
+	InjectPacket(User, TransmitPacket) error
+}
+
+type TransmitPacket struct {
+	ArbId string
+	Network string
+	B1 string
+	B2 string
+	B3 string
+	B4 string
+	B5 string
+	B6 string
+	B7 string
+	B8 string
 }
 
 type CanData struct {
@@ -124,6 +140,18 @@ func InitAPI() {
 	APIVersion.Minor = 0
 	APIVersion.Sub = 2
 	ServerVersion.Version = APIVersion.ToString()
+}
+
+func Atoui8(s string)(n uint8, err error) {
+	if s == "" {
+		return 0, nil
+	}
+	n64, err := strconv.Atoi(s)
+	n = uint8(n64)
+	if err == nil && n64 > 255 {
+		err = strconv.ErrRange
+	}
+	return
 }
 
 func ProcessLogin(cmd *Cmd) error {

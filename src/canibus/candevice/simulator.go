@@ -190,3 +190,8 @@ func (sim *Simulator) GetPacketsFrom(idx int) ([]api.CanData, int) {
 func (sim *Simulator) GetPacketIdx() int {
 	return sim.packetIdx
 }
+
+func (sim *Simulator) InjectPacket(pkt api.CanData) error {
+	sim.addPacket(pkt)
+	return nil
+}

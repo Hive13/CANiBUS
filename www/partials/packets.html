@@ -1,4 +1,5 @@
 <TABLE id="packetsTbl">
+ <thead>
   <tr id=packetHeaderRow>
     <th id=first class="packetHdr packetSrc">Src</th>
     <th class="packetHdr packetArbID" ng-click="predicate='ArbID';reverse=!reverse">ArbID</th>
@@ -13,7 +14,9 @@
     <th class="packetHdr packetB8">B8</th>
     <th id=last class="packetHdr">Notes</th>
   </tr>
-  <tr ng-class-odd="'packetRowOdd'" ng-class-even="'paccketRowEven'" ng-repeat="packet in packets | orderBy:predicate:reverse" >
+ </thead>
+ <tbody>
+  <tr ng-class-odd="'packetRowOdd'" ng-class-even="'paccketRowEven'" ng-repeat="packet in packets | orderBy:predicate:reverse" ng-dblclick="copyPacket(packet)" >
     <td class="packetSrc">{{packet.Src}}</td>
     <td class="packetArbID">{{packet.ArbID}}</td>
     <td class="packetNetwork">{{packet.Network}}</td>
@@ -35,4 +38,5 @@
     <td ng-if="!packet.B8changed" class="packetB8">{{packet.B8}}</td>
     <td class="packetNotes">{{packet.Notes}}</td>
   </tr>
+ <tbody>
 </TABLE>

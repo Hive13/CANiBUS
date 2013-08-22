@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"canibus/api"
 	"canibus/candevice"
 	"canibus/core"
 	"canibus/hacksession"
@@ -49,6 +50,56 @@ func partialLobbyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, "%s", p.Body)
 }
+
+func haxTransmitHandler(w http.ResponseWriter, r *http.Request) {
+	logger.Log("Transmit Packet")
+	auth_err := checkAuth(w, r)
+	if auth_err != nil {
+		return
+	}
+	vars := mux.Vars(r)
+	canId, canId_err := strconv.Atoi(vars["id"])
+	if canId_err != nil {
+		http.Error(w, canId_err.Error(), http.StatusNotFound)
+		return
+	}
+	dev, dev_err := core.GetDeviceById(canId)
+	if dev_err != nil {
+		http.Error(w, dev_err.Error(), http.StatusNotFound)
+		return
+	}
+	session, _ := store.Get(r, "canibus")
+	userName := session.Values["user"].(string)
+	user, _ := core.GetUserByName(userName)
+
+	hax := dev.GetHackSession()
+	if hax == nil {
+		http.Error(w, "Session not configured", http.StatusNotFound)
+		return
+	}
+	if !hax.IsActiveUser(user) {
+		http.Error(w, "You are not a part of this hacksession", http.StatusNotFound)
+		return
+	}
+	jsonTx := r.FormValue("tx")
+	var TxPkts []api.TransmitPacket
+	jerr := json.Unmarshal([]byte(jsonTx), &TxPkts)
+	if jerr != nil {
+		logger.Log("Transmit unmarshal error on: " + jsonTx)
+		http.Error(w, jerr.Error(), http.StatusNotFound)
+		return
+	}
+	for i := range TxPkts {
+		inject_err := hax.InjectPacket(user, TxPkts[i])
+		if inject_err != nil {
+			logger.Log("Transmit packet error: " + inject_err.Error())
+			http.Error(w, inject_err.Error(), http.StatusNotFound)
+			return
+		}
+	}
+	fmt.Fprintf(w, "%s", "OK")
+}
+
 
 func haxStopHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Log("Stop Sniffer")
@@ -318,6 +369,7 @@ func StartSPAWebListener(root string, ip string, port string) error {
 	r.HandleFunc("/hax/{id}/packets", haxPacketsHandler)
 	r.HandleFunc("/hax/{id}/start", haxStartHandler)
 	r.HandleFunc("/hax/{id}/stop", haxStopHandler)
+	r.HandleFunc("/hax/{id}/transmit", haxTransmitHandler)
 	r.HandleFunc("/candevices", candevicesHandler)
 	r.HandleFunc("/lobby/AddSimulator", addSimHandler)
 

@@ -2,6 +2,7 @@ package hacksession
 
 import (
 	"canibus/api"
+	"canibus/logger"
 	"fmt"
 )
 
@@ -88,4 +89,49 @@ func (s *HackSession) GetPackets(user api.User) []api.CanData {
 	// TODO: Apply filters
 	user.SetLastIdx(idx)
 	return pkts
+}
+
+func (s *HackSession) InjectPacket(user api.User, TxPkt api.TransmitPacket) error {
+	if s.Device == nil {
+		return logger.Err("Device not set")
+	}
+	var err error
+	pkt := api.CanData{}
+	pkt.Src = user.GetName()
+	pkt.ArbID = TxPkt.ArbId
+	pkt.Network = TxPkt.Network
+	pkt.B1, err = api.Atoui8(TxPkt.B1)
+	if err != nil {
+		return err
+	}
+	pkt.B2, err = api.Atoui8(TxPkt.B2)
+	if err != nil {
+		return err
+	}
+	pkt.B3, err = api.Atoui8(TxPkt.B3)
+	if err != nil {
+		return err
+	}
+	pkt.B4, err = api.Atoui8(TxPkt.B4)
+	if err != nil {
+		return err
+	}
+	pkt.B5, err = api.Atoui8(TxPkt.B5)
+	if err != nil {
+		return err
+	}
+	pkt.B6, err = api.Atoui8(TxPkt.B6)
+	if err != nil {
+		return err
+	}
+	pkt.B7, err = api.Atoui8(TxPkt.B7)
+	if err != nil {
+		return err
+	}
+	pkt.B8, err = api.Atoui8(TxPkt.B8)
+	if err != nil {
+		return err
+	}
+	err = s.Device.InjectPacket(pkt)
+	return err
 }
