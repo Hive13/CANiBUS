@@ -2,6 +2,8 @@
   <HEAD>
     <TITLE>CANiBUS Server</TITLE>
     <SCRIPT src="/js/angular.js"></SCRIPT>
+    <SCRIPT src="/js/angular-route.js"></SCRIPT>
+    <SCRIPT src="/js/angular-animate.js"></SCRIPT>
     <SCRIPT src="/js/canibus.js"></SCRIPT>
     <LINK href="/bootstrap/css/bootstrap.css" rel="stylesheet">
     <LINK href="/css/flat-ui.css" rel="stylesheet">
@@ -10,6 +12,6 @@
   <BODY>
       <div id=title><h1>CANiBUS</h1></div>
       <HR>
-      <div ng-view ></div>
+      <div ng-view class=viewAnimate></div>
   </BODY>
 </HTML>

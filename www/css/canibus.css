@@ -114,6 +114,16 @@ table#packetsTbl tbody {
 .byteChange {
   background-color: #f39c12;
 }
+.byteChange.ng-enter {
+  -webkit-transition:1s linear all;
+  -moz-transition:1s linear all;
+  -o-transition:1s linear all;
+  transition:1s linear all;
+  background: #f39c12;
+}
+.byteChange.ng-enter.ng-enter-active {
+  background: #ecf0f1;
+}
 
 .packetSrc {
   width: 6em;
@@ -171,9 +181,21 @@ table#packetsTbl tbody {
   width: 4em;
 }
 
+
+.viewAnimate.ng-enter {
+  -webkit-transition:0.5s linear all;
+  -moz-transition:0.5s linear all;
+  -o-transition:0.5s linear all;
+  transition:0.5s linear all;
+  opacity:0;
+}
+.viewAnimate.ng-enter.ng-enter-active {
+  opacity:1;
+}
+
 .animate-enter {
-  -webkit-transition: 1s linear all;
-  transition: 1s linear all;
+  -webkit-transition: 3s linear all;
+  transition: 3s linear all;
   opacity: 0;
 }
 

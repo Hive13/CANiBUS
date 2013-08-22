@@ -1,4 +1,4 @@
-var canibus = angular.module('canibus', []);
+var canibus = angular.module('canibus', ['ngRoute', 'ngAnimate']);
 
 var controllers = {};
 
@@ -169,6 +169,11 @@ controllers.haxController = function($scope, $filter, $http, $timeout, $routePar
 
   function addPackets(packets) {
     var changed = false;
+    if(packets == "null") {
+      // Blank return...try again in a bit
+      snifferPromise = $timeout(function() { $scope.fetchPackets($scope.id); }, pollTimer);
+      return;
+    }
     angular.forEach(packets, function(pkt) {
       if ($scope.viewType == 'SeqView') {
         if (!PacketInList(pkt)) {

@@ -170,7 +170,7 @@ func (sim *Simulator) GetPacketsFrom(idx int) ([]api.CanData, int) {
 	done = false
 	appends := 0
 	for done != true {
-		if idx > MAX_BUFFER || idx < 0 {
+		if idx >= MAX_BUFFER || idx < 0 {
 			idx = 0
 		}
 		if idx == sim.packetIdx {
