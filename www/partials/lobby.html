@@ -9,7 +9,7 @@
          <td class="lobbyDev">{{device.DeviceType}}</td>
          <td class="lobbyDev">
             {{device.DeviceDesc}}
-            <div ng-show="showDetails" ng-animate="'animate'">{{device.Year}} {{device.Make}} {{device.Model}}</div>
+            <div ng-show="showDetails" class="animate">{{device.Year}} {{device.Make}} {{device.Model}}</div>
          </td>
          <td class="lobbyDev">{{device.HackSession}}</td>
          <td id="lobbyAction" class="lobbyDev"><div ng-switch on="device.HackSession">

@@ -3,6 +3,7 @@ package api
 
 import (
 	"canibus/logger"
+	"encoding/hex"
 	"strconv"
 	"fmt"
 )
@@ -140,6 +141,12 @@ func InitAPI() {
 	APIVersion.Minor = 0
 	APIVersion.Sub = 2
 	ServerVersion.Version = APIVersion.ToString()
+}
+
+func Hextoui8(s string)(n uint8, err error) {
+	bnum, err := hex.DecodeString(s)
+	n = bnum[0]
+	return
 }
 
 func Atoui8(s string)(n uint8, err error) {

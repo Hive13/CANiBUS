@@ -193,13 +193,26 @@ table#packetsTbl tbody {
   opacity:1;
 }
 
-.animate-enter {
-  -webkit-transition: 3s linear all;
-  transition: 3s linear all;
+.animate.ng-hide-add {
+  -webkit-transition:0.5s linear all;
+  -moz-transition:0.5s linear all;
+  -o-transition:0.5s linear all;
+  transition:0.5s linear all;
+  opacity: 1;
+}
+.animate.ng-hide-add.ng-hide-add-active {
   opacity: 0;
 }
 
-.animate-enter.animate-enter-active {
+.animate.ng-hide-remove {
+  -webkit-transition:0.5s linear all;
+  -moz-transition:0.5s linear all;
+  -o-transition:0.5s linear all;
+  transition:0.5s linear all;
+  display:block!important;
+  opacity: 0;
+}
+.animate,.animate.ng-hide-remove.ng-hide-remove-active {
   opacity: 1;
 }
 
