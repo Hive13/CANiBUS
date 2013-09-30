@@ -280,6 +280,15 @@ controllers.haxController = function($scope, $filter, $http, $timeout, $routePar
       $scope.transmitErr = "You must specify an ArbId";
       return;
     }
+    // Lame method to force string type
+    $scope.tx.B1 = $scope.tx.B1.toString();
+    $scope.tx.B2 = $scope.tx.B2.toString();
+    $scope.tx.B3 = $scope.tx.B3.toString();
+    $scope.tx.B4 = $scope.tx.B4.toString();
+    $scope.tx.B5 = $scope.tx.B5.toString();
+    $scope.tx.B6 = $scope.tx.B6.toString();
+    $scope.tx.B7 = $scope.tx.B7.toString();
+    $scope.tx.B8 = $scope.tx.B8.toString();
     pkt = "[" + JSON.stringify($scope.tx) + "]";
     $http({
       url: "/hax/"+id+"/transmit",

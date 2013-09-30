@@ -16,6 +16,8 @@ type Elm327 struct {
 	Type              string
 	Desc              string
 	VIN               string
+	Protocol          string
+	Header            string
 	id                int
 	Year              string
 	Make              string
@@ -59,19 +61,21 @@ func (e *Elm327) Init() bool {
 	//e.Serial.ReadLn() // Clear buffer
 	fmt.Println("Sending Reset")
 	resp, _ = e.SendCmd("ATI")
-	fmt.Println("DEBUG: resp=", resp)
 	e.Type = resp[0]
-	fmt.Println("DEBUG: Type=",e.Type)
 	fmt.Println("Turning off echo")
 	e.SendCmd("ATE0")
 	e.SendCmd("ATH0")
 	vin := e.GetVIN()
-	fmt.Println("got vin: ", vin)
-	e.Desc = "VIN: " + vin
-	e.Year = obd.GetYearFromVIN(vin)
-	e.Make = obd.GetMakeFromVIN(vin)
-	e.VehicleAttributes = obd.GetModelFromVIN(vin)
+	if len(vin) > 0 {
+		fmt.Println("got vin: ", vin)
+		e.Desc = "VIN: " + vin
+		e.Year = obd.GetYearFromVIN(vin)
+		e.Make = obd.GetMakeFromVIN(vin)
+		e.VehicleAttributes = obd.GetModelFromVIN(vin)
+	}
+	e.GetProto()
 	e.SendCmd("ATH1")
+	e.SendCmd("ATR0") // Turn off responses
 	return true
 }
 
@@ -99,10 +103,28 @@ func (e *Elm327) SetHackSession(hax api.HackSession) {
 	e.HackSession = hax
 }
 
+func (e *Elm327) GetProto() string {
+	if e.Protocol != "" {
+		return e.Protocol
+	}
+	resp, err := e.SendCmd("ATDP")
+	if err != nil {
+		return err.Error()
+	}
+	if strings.Contains(resp[0], "ISO 15765-4 (CAN 11/500)") {
+		e.Protocol = "HS-CAN"
+	} else {
+		e.Protocol = resp[0]
+	}
+	return e.Protocol
+}
+
 func (e *Elm327) GetVIN() string {
 	if e.VIN != "" {
 		return e.VIN
 	}
+	e.SendCmd("ATR1")
+	e.SendCmd("ATSH 7DF")
 	cmdResp, vin_err := e.SendCmd("09 02")
 	if vin_err != nil {
 		return vin_err.Error()
@@ -327,6 +349,7 @@ func (e *Elm327) parsePacket(data string) api.CanData {
 		}
 		idx += 1
 	}
+	pkt.Network = e.Protocol
 	return pkt
 }
 
@@ -421,7 +444,22 @@ func (e *Elm327) GetPacketIdx() int {
 }
 
 func (e *Elm327) InjectPacket(pkt api.CanData) error {
-	// TODO the actual sending of the packet to the candevice
+	if e.Header != pkt.ArbID {
+		e.SendCmd("ATSH " + pkt.ArbID)
+		e.Header = pkt.ArbID
+	}
+	// TODO: Figure out why ELM327 won't send 8 bytes..only 7
+	//data := make([]byte, 8)
+	data := make([]byte, 7)
+	data[0] = pkt.B1
+	data[1] = pkt.B2
+	data[2] = pkt.B3
+	data[3] = pkt.B4
+	data[4] = pkt.B5
+	data[5] = pkt.B6
+	data[6] = pkt.B7
+	//data[7] = pkt.B8
+	e.SendCmd(hex.EncodeToString(data))
 	e.addPacket(pkt)
 	return nil
 }
